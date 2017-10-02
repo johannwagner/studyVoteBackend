@@ -189,7 +189,7 @@ class DatabaseAdapter {
      */
     createWherePart(params)
     {
-        if(params.length <= 0) {
+        if(Object.keys(params).length <= 0) {
             return '';
         }
 
