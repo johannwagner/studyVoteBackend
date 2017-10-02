@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const userRouter = require('./src/routes/userRoute');
 const tokenRouter = require('./src/routes/tokenRoute');
+const userProgressRouter = require('./src/routes/userProgressRoute');
 
 const expressInstance = express();
 
@@ -16,6 +17,7 @@ expressInstance.use(urlEncodedParser);
 // Adding Routers to Servers
 expressInstance.use('/token', tokenRouter);
 expressInstance.use('/user', userRouter);
+expressInstance.use('/userProgress', userProgressRouter);
 
 // TODO: Add Parameter for Port
 expressInstance.listen(1337);

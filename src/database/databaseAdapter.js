@@ -136,25 +136,43 @@ class DatabaseAdapter {
      */
     putAdmissionRequirement(admissionRequirement)
     {
+        let promiseQuery = this.poolPromise.query('INSERT INTO admissionRequirement (courseInstanceId)' +
+            '  VALUES(?)',
+            [admissionRequirement.courseInstanceId]);
 
+        return promiseQuery.then((result) => {
+            admissionRequirement.id = result.insertId;
+            return admissionRequirement;
+        });
     }
 
     /**
      * Saves the admissionRequirementItem to the database and returns the admissionRequirementItem with filled id
-     * @param admissionRequirementItem
+     * @param arItem
      */
-    putAdmissionRequirementItem(admissionRequirementItem)
+    putAdmissionRequirementItem(arItem)
     {
+        let promiseQuery = this.poolPromise.query('INSERT INTO admissionRequirementItem (admissionRequirementType, expireDate, maxTasks, minTasks, minPercentage, mandatory, admissionRequirementId)' +
+            '  VALUES(?, ?, ?, ?, ?, ?, ?)',
+            [arItem.admissionRequirementType, arItem.expireDate, arItem.maxTasks, arItem.minTasks, arItem.minPercentage, arItem.madatory, arItem.admissionRequirementId  ]);
 
+        return promiseQuery.then((result) => {
+            arItem.id = result.insertId;
+            return arItem;
+        });
     }
 
     /**
      * Gets the admissionRequirementItems matching the passed params
-     * @param params semesterId
+     * @param params courseInstanceId
      */
     getAdmissionRequirementItems(params)
     {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM admissionRequirementItem ' + this.createWherePart(params));
 
+        return promiseQuery.then((result) => {
+            return result;
+        });
     }
 
     //endregion
@@ -165,9 +183,16 @@ class DatabaseAdapter {
      * Saves the userProgess to the database and returns the userProgess with filled id
      * @param userProgess
      */
-    putUserProgess(admissionRequirementItem)
+    putUserProgress(userProgress)
     {
+        let promiseQuery = this.poolPromise.query('INSERT INTO userProgress (userId, admissionRequirementItemWeekId, taskCount)' +
+            '  VALUES(?, ?, ?)',
+            [userProgress.userId, userProgress.admissionRequirementItemWeekId, userProgress.taskCount]);
 
+        return promiseQuery.then((result) => {
+            userProgress.id = result.insertId;
+            return userProgress;
+        });
     }
 
     /**
