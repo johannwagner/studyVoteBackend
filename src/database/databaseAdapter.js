@@ -80,10 +80,7 @@ class DatabaseAdapter {
      */
     getCourses(params)
     {
-        let promiseQuery = this.poolPromise.query('SELECT * FROM course where shortName = ? and ' +
-            'displayName = ?',[params.shortName, params.displayName]);
-
-
+        let promiseQuery = this.poolPromise.query('SELECT * FROM course' + this.createWherePart(params));
 
         return promiseQuery.then((paramsParam) => {
             if(paramsParam.length <= 0) {
@@ -104,7 +101,7 @@ class DatabaseAdapter {
      */
     putCourseInstance(courseInstance)
     {
-
+        
     }
 
     /**
