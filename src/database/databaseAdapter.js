@@ -1,6 +1,6 @@
 const MySQL = require('promise-mysql');
 const DatabaseSecrets = require('../../secrets/databaseSecrets');
-
+const _ = require('lodash');
 
 class DatabaseAdapter {
     constructor(poolCount) {
@@ -185,11 +185,19 @@ class DatabaseAdapter {
 
     /**
      * Creates a SQL WHERE String including the passed parameters
-     * @param params Array of columnNames and values
+     * @param params Object of columnNames and values
      */
     createWherePart(params)
     {
+        if(params.length <= 0) {
+            return '';
+        }
 
+        let whereParts = _.map(params, (value, key) => {
+            return this.poolPromise.escapeId(key) + '=' + this.poolPromise.escape(value);
+        });
+
+        return 'WHERE ' + whereParts.join(' AND ')
     }
 
     //endregion
