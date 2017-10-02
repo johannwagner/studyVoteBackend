@@ -4,6 +4,7 @@ const routerInstance = express.Router();
 const DatabaseAdapter = require('../database/databaseAdapter');
 const Constants = require('../Constants');
 const databaseAdapter = new DatabaseAdapter(5);
+const createSignedToken = require('../helper/tokenhelper').createSignedToken;
 
 routerInstance.post('/', (req, res, next) => {
     let userMail = req.body.userMail;
@@ -22,7 +23,7 @@ routerInstance.post('/', (req, res, next) => {
             expiresIn: '7d'
         };
 
-        let jwtToken = jsonWebToken.sign({userId: user.id}, Constants.SIGNING_SECRET, jwtOptions)
+        let jwtToken = createSignedToken({userId: user.id});
 
         res.status(200).json({
             token: jwtToken
