@@ -7,6 +7,7 @@ module.exports = {
         UNKNOWN_USER: 2,
         NO_TOKEN: 3,
         WRONG_TOKEN: 4,
+        ENSURED_PARAMETER_NOT_FULFILLED: 5,
     },
     /**
      * Secret for JWT Tokens.
