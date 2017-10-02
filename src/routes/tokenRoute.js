@@ -27,7 +27,7 @@ routerInstance.post('/', (req, res, next) => {
 
         res.status(200).json({
             token: jwtToken
-        })
+        });
 
     }).catch((error) => {
         res.status(500).json(error);

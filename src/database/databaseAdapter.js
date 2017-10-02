@@ -12,6 +12,11 @@ class DatabaseAdapter {
 
     }
 
+    /**
+     * Gets the user from database matching the passed userEmail
+     * @param userParams Must be filled with userEmail
+     * @returns user Object
+     */
     getUser(userParams) {
 
         let promiseQuery;
@@ -28,8 +33,23 @@ class DatabaseAdapter {
             } else {
                 return users[0];
             }
-        })
+        });
 
+    }
+
+    /**
+     * Saves the user to the database and returns the user with filled id
+     * @param user User Object
+     */
+    putUser(user)
+    {
+        let promiseQuery = this.poolPromise.query('INSERT INTO user (email, displayName, createDate, lastLoginDate, passwordHash) VALUES(?, ?, ?, ?, ?)',
+            [user.email, user.displayName, user.createDate, user.lastLoginDate, user.passwordHash]);
+
+        return promiseQuery.then((result) => {
+            user.id = result.insertId;
+            return user;
+        });
     }
 }
 
