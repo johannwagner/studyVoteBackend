@@ -45,8 +45,9 @@ class DatabaseAdapter {
      */
     putUser(user)
     {
-        let promiseQuery = this.poolPromise.query('INSERT INTO user (email, displayName, createDate, lastLoginDate, passwordHash) VALUES(?, ?, ?, ?, ?)',
-            [user.email, user.displayName, user.createDate, user.lastLoginDate, user.passwordHash]);
+        let promiseQuery = this.poolPromise.query('INSERT INTO user (email,' +
+            ' displayName, passwordHash) VALUES(?, ?, ?)',
+            [user.email, user.displayName, user.passwordHash]);
 
         return promiseQuery.then((result) => {
             user.id = result.insertId;
