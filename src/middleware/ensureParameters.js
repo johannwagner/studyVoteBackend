@@ -11,7 +11,7 @@ exports.ensureParameters = function(ensureParameters) {
         for(let i = 0; i < ensureParameters.length; i++){
             let ensuredParameter = ensureParameters[i];
 
-            if(_.isUndefined(req[ensuredParameter])){
+            if(_.isUndefined(req.body[ensuredParameter])){
                 res.status(422).json({
                     ensuredParameter: ensuredParameter,
                     errorCode: Constants.ErrorConstants.ENSURED_PARAMETER_NOT_FULFILLED
