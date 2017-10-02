@@ -65,7 +65,13 @@ class DatabaseAdapter {
      */
     putCourse(course)
     {
+        let promiseQuery = this.poolPromise.query('INSERT INTO course (shortName, displayName) VALUES ' +
+            '(?,?)',[course.shortName, course.displayName]);
 
+        return promiseQuery.then((result) => {
+           course.id = result.insertId;
+           return course;
+        });
     }
 
     /**
@@ -74,7 +80,15 @@ class DatabaseAdapter {
      */
     getCourses(params)
     {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM course' + this.createWherePart(params));
 
+        return promiseQuery.then((paramsParam) => {
+            if(paramsParam.length <= 0) {
+                return null;
+            } else {
+                return paramsParam[0];
+            }
+        });
     }
 
     //endregion
@@ -87,7 +101,7 @@ class DatabaseAdapter {
      */
     putCourseInstance(courseInstance)
     {
-
+        
     }
 
     /**
