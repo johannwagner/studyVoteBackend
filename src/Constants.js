@@ -9,7 +9,9 @@ module.exports = {
         WRONG_TOKEN: 4,
         ENSURED_PARAMETER_NOT_FULFILLED: 5,
         USER_ALREADY_REGISTERED: 6,
-        INVALID_PARAMETERS: 7
+        INVALID_PARAMETERS: 7,
+        DUPLICATE_ENTRY: 8,
+        DATABASE_ERROR: 9
     },
     /**
      * Secret for JWT Tokens.
