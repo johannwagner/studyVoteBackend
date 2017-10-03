@@ -3,11 +3,14 @@ const DatabaseSecrets = require('../../secrets/databaseSecrets');
 const _ = require('lodash');
 
 class DatabaseAdapter {
-    constructor(poolCount) {
+    constructor(poolCount = 5) {
+
+        const inTestMode = process.env.NODE_ENV === 'test';
 
         this.poolPromise = MySQL.createPool({
             ...DatabaseSecrets.DatabaseSecrets,
-            connectionLimit: poolCount
+            connectionLimit: poolCount,
+            database: DatabaseSecrets.DatabaseSecrets.database + ( inTestMode ? 'test' : '' )
         })
 
     }
@@ -212,7 +215,7 @@ class DatabaseAdapter {
 
     /**
      * Gets the admissionRequirementItems matching the passed params
-     * @param params semesterId
+     * @param params courseInstanceId
      */
     getAdmissionRequirementItems(params)
     {
@@ -294,6 +297,20 @@ class DatabaseAdapter {
         });
 
         return 'WHERE ' + whereParts.join(' AND ')
+    }
+
+    /**
+     * Method removes data from table. It does not complain about foreign keys.
+     * @param tableName Name of table
+     */
+    truncateTable(tableName) {
+        return this.poolPromise.query("SET FOREIGN_KEY_CHECKS = 0").then(() => {
+            return this.poolPromise.query("TRUNCATE ??", [tableName]);
+        }).then(() => {
+            return this.poolPromise.query("SET FOREIGN_KEY_CHECKS = 1");
+        }).catch((error) => {
+            throw Error(error);
+        })
     }
 
     //endregion

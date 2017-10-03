@@ -1,7 +1,6 @@
 const express = require('express');
 const routerInstance = express.Router();
 const Constants = require('../Constants');
-const jsonWebToken = require('jsonwebtoken');
 const authenticationMiddleware = require('../middleware/authenticationMiddleware').authenticationMiddleware;
 const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['email', 'displayName', 'passwordHash']);
 const DatabaseAdapter = require('../database/databaseAdapter');
