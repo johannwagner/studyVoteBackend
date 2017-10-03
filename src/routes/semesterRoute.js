@@ -61,11 +61,11 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware, (r
 //region - Not Used -
 
 routerInstance.delete('/', (req, res, next) => {
-
+    res.status(403).send('not implemented');
 });
 
 routerInstance.post('/', (req, res, next) => {
-
+    res.status(403).send('not implemented');
 });
 
 //endregion

@@ -6,6 +6,8 @@ const Constants = require('../Constants');
 const databaseAdapter = new DatabaseAdapter(5);
 const createSignedToken = require('../helper/tokenhelper').createSignedToken;
 
+//region - Post -
+
 routerInstance.post('/', (req, res, next) => {
     let userMail = req.body.userMail;
     let userPasswordHash = req.body.userPasswordHash;
@@ -33,6 +35,25 @@ routerInstance.post('/', (req, res, next) => {
         res.status(500).json(error);
     })
 });
+
+//endregion
+
+//region - Not used -
+
+routerInstance.delete('/', (req, res, next) => {
+    res.status(403).send('not implemented');
+});
+
+routerInstance.put('/', (req, res, next) => {
+    res.status(403).send('not implemented');
+});
+
+routerInstance.get('/', (req, res, next) => {
+    res.status(403).send('not implemented');
+});
+
+
+//endregion
 
 module.exports = routerInstance;
 

@@ -58,14 +58,35 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware, (r
 
 //endregion
 
-//region - Not Used -
+//region - Delete -
 
-routerInstance.delete('/', (req, res, next) => {
+/**
+ * Save a userCourseInstance for the current User
+ * Delete Parameter: id
+ **/
+routerInstance.delete('/:id',authenticationMiddleware, (req, res, next) => {
+    // Check which parameters are passed in the request
+    let userCourseInstance = {
+        userId: req.tokenContext.userId, // Be sure to remove only a userCourseInstance which is from the current User
+        id: req.params.id
+    };
+
+    // remove the matching userCourseInstance
+    databaseAdapter.deleteUserCourseInstance(userCourseInstance).then((result) => {
+        //TODO: What to send back in case of success
+        res.status(200).send('TODO: What to send back in case of success');
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
 
 });
 
-routerInstance.post('/', (req, res, next) => {
+//endregion
 
+//region - Not Used -
+
+routerInstance.post('/', (req, res, next) => {
+    res.status(403).send('not implemented');
 });
 
 //endregion
