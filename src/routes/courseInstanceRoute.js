@@ -44,7 +44,7 @@ routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let courseInstance = {
-        semesterId: req.headers['semesterid']
+        semesterId: req.body.semesterId
     };
 
     // courseId
