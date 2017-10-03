@@ -296,7 +296,7 @@ class DatabaseAdapter {
             return this.poolPromise.escapeId(key) + '=' + this.poolPromise.escape(value);
         });
 
-        return 'WHERE ' + whereParts.join(' AND ')
+        return ' WHERE ' + whereParts.join(' AND ')
     }
 
     /**
