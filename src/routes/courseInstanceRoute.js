@@ -93,7 +93,7 @@ routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
 function putCourseInstance(req, res, next, courseInstance)
 {
     return databaseAdapter.putCourseInstance(courseInstance).then((courseInstance) => {
-        res.status(200).json({ id: courseInstance.id});
+        res.status(200).json(courseInstance);
     }).catch((error) => {
         res.status(500).json(error);
     });
