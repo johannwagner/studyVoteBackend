@@ -141,7 +141,20 @@ function putCourseInstance(req, res, next, courseInstance)
     return databaseAdapter.putCourseInstance(courseInstance).then((courseInstance) => {
         res.status(200).json(courseInstance);
     }).catch((error) => {
-        res.status(500).json(error);
+        switch(error.code)
+        {
+            case 'ER_DUP_ENTRY':
+                res.status(500).json({
+                    error: 'CourseInstance already existing in the semester',
+                    errorCode: Constants.ErrorConstants.DUPLICATE_ENTRY
+                });
+                break;
+            default:
+                res.status(500).json({
+                    error: error.sqlMessage,
+                    errorCode: Constants.ErrorConstants.DATABASE_ERROR
+                });
+        }
     });
 }
 

@@ -24,7 +24,7 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
         params.id = req.params.id;
 
     // Get the semesters matching the given params
-    databaseAdapter.getSemesters(params).then((semesters) => {
+    databaseAdapter.getSemester(params).then((semesters) => {
         res.status(200).json(semesters);
     }).catch((error) => {
         res.status(500).json(error);
