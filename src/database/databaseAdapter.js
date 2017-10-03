@@ -3,7 +3,9 @@ const DatabaseSecrets = require('../../secrets/databaseSecrets');
 const _ = require('lodash');
 
 class DatabaseAdapter {
-    constructor(poolCount = 5, inTestMode = false) {
+    constructor(poolCount = 5) {
+
+        const inTestMode = process.env.NODE_ENV === 'test';
 
         this.poolPromise = MySQL.createPool({
             ...DatabaseSecrets.DatabaseSecrets,
