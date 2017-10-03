@@ -32,6 +32,30 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
     });
 });
 
+/**
+ * Get the courseInstanceGroups from database
+ * Get Parameter:
+ * returns: the courseInstanceGroups matching the given id
+ **/
+routerInstance.get('/:id/group/:groupId?', authenticationMiddleware, (req, res, next) => {
+
+    // Check which parameters are passed in the request
+    let params = {
+        courseInstanceId: req.params.id
+    };
+
+    // Handle optional parameters
+    if(req.params.groupId)
+        params.id = req.params.groupId;
+
+    // Get the courseInstanceGroups matching the given params
+    databaseAdapter.getCourseInstanceGroups(params).then((courseInstanceGroups) => {
+        res.status(200).json(courseInstanceGroups);
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
+});
+
 //endregion
 
 //region - Put -
@@ -44,7 +68,7 @@ routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let courseInstance = {
-        semesterId: req.headers['semesterid']
+        semesterId: req.body.semesterId
     };
 
     // courseId
@@ -78,6 +102,28 @@ routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
 
 });
 
+/**
+ * Saves the courseInstanceGroup to database
+ * Put Parameter: room?, startTime?, endTime?
+ **/
+routerInstance.put('/:id/group/', authenticationMiddleware, (req, res, next) => {
+
+    // Check which parameters are passed in the request
+    let courseInstanceGroup = {
+        courseInstanceId: req.params.id,
+        room: req.body.room,
+        startTime: req.body.startTime,
+        endTime: req.body.endTime
+    };
+
+    // Get the courseInstanceGroups matching the given params
+    databaseAdapter.putCourseInstanceGroup(courseInstanceGroup).then((courseInstanceGroup) => {
+        res.status(200).json(courseInstanceGroup);
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
+});
+
 //endregion
 
 //region - Help Methods -
@@ -93,7 +139,7 @@ routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
 function putCourseInstance(req, res, next, courseInstance)
 {
     return databaseAdapter.putCourseInstance(courseInstance).then((courseInstance) => {
-        res.status(200).json({ id: courseInstance.id});
+        res.status(200).json(courseInstance);
     }).catch((error) => {
         res.status(500).json(error);
     });
@@ -104,11 +150,11 @@ function putCourseInstance(req, res, next, courseInstance)
 //region - Not Used -
 
 routerInstance.delete('/', (req, res, next) => {
-
+    res.status(403).send('not implemented');
 });
 
 routerInstance.post('/', (req, res, next) => {
-
+    res.status(403).send('not implemented');
 });
 
 //endregion

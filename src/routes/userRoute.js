@@ -7,16 +7,11 @@ const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
 const createSignedToken = require('../helper/tokenhelper').createSignedToken;
 
-routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
-    res.send({message: 'Hallo Fred.', tokenContext: req.tokenContext})
-});
-
-routerInstance.post('/', (req, res, next) => {
-
-});
+//region - Put -
 
 /**
  * Saves a user to the database, checks if a user already exists to the email and sends the jwt token back
+ * Put Parameter: email, displayName, passwordHash
  */
 routerInstance.put('/', ensureParametersMiddleware ,(req, res, next) => {
 
@@ -47,8 +42,22 @@ routerInstance.put('/', ensureParametersMiddleware ,(req, res, next) => {
     });
 });
 
-routerInstance.delete('/', (req, res, next) => {
+//endregion
 
+//region - Not used -
+
+routerInstance.delete('/', (req, res, next) => {
+    res.status(403).send('not implemented');
 });
+
+routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
+    res.status(403).send('not implemented');
+});
+
+routerInstance.post('/', (req, res, next) => {
+    res.status(403).send('not implemented');
+});
+
+//endregion
 
 module.exports = routerInstance;
