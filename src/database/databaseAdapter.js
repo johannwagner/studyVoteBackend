@@ -3,11 +3,12 @@ const DatabaseSecrets = require('../../secrets/databaseSecrets');
 const _ = require('lodash');
 
 class DatabaseAdapter {
-    constructor(poolCount) {
+    constructor(poolCount = 5, inTestMode = false) {
 
         this.poolPromise = MySQL.createPool({
             ...DatabaseSecrets.DatabaseSecrets,
-            connectionLimit: poolCount
+            connectionLimit: poolCount,
+            database: DatabaseSecrets.DatabaseSecrets.database + ( inTestMode ? 'Test' : '' )
         })
 
     }
