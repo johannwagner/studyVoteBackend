@@ -70,9 +70,6 @@ class DatabaseAdapter {
      */
     putCourse(course)
     {
-        /*let promiseQuery = this.poolPromise.query('INSERT INTO course (shortName, displayName) VALUES ' +
-            '(?,?)',[course.shortName, course.displayName]);*/
-
         let promiseQuery = this.poolPromise.query('INSERT INTO course ' + this.createInsertPart(course));
 
         return promiseQuery.then((result) => {
@@ -101,7 +98,30 @@ class DatabaseAdapter {
     //endregion
 
     //region - semester
-    //TODO put & get semester, delete usercourseinstance
+    //TODO  course instance group
+    /**
+     * Adds new semester to table, returns new entry
+     * @param semester
+     */
+    putSemester(semester){
+        let promiseQuery = this.poolPromise.query('INSERT INTO semester ' + this.createInsertPart(semester));
+
+        return promiseQuery.then((param) => {
+            return param;
+        });
+    }
+
+    /**
+     * Searches for a semester inside of the semester table according to search parameters
+     * @param semester
+     */
+    getSemester(semester){
+        let promiseQuery = this.poolPromise.query('SELECT * FROM semester '+ this.createInsertPart(semester));
+
+        return promiseQuery.then((param) => {
+            return param;
+        });
+    }
 
     //endregion
 
@@ -130,20 +150,24 @@ class DatabaseAdapter {
      */
     getCourseInstances(params)
     {
-        let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, course.id as course.id2 FROM courseInstance JOIN course ON courseInstance.courseId = course.id ' + this.createWherePart(params));
+        let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, course.id as id2, semester.id as id3, semester.displayName as semesterName, semester.startDate, semester.endDate FROM courseInstance JOIN semester ON courseInstance.semesterId = semester.id JOIN course ON courseInstance.courseId = course.id ' + this.createWherePart(params));
 
         return promiseQuery.then((list) => {
             let result = [];
             _.forEach(list, (current) => {
-                let temp2 = {
-                    id: current.id2,
-                    shortName: current.shortName,
-                    displayName: current.displayName,
-                    };
                 let temp = {
                     id: current.id,
-                    course: temp2,
-                    semesterId: current.semesterId,
+                    course: {
+                        id: current.id2,
+                        shortName: current.shortName,
+                        displayName: current.displayName,
+                    },
+                    semester: {
+                        id : current.id3,
+                        semesterName : current.semesterName,
+                        semesterStart : current.startDate,
+                        semesterEnd : current.endDate,
+                    },
                     };
                 result.push(temp)
                 });
@@ -151,6 +175,14 @@ class DatabaseAdapter {
             });
     }
 
+    /**
+     * Deletes one entry from CourseInstance table
+     * @param params
+     */
+    deleteUserCourseInstance(params){
+        this.poolPromise.query('DELETE FROM usercourseinstance ' + this.createWherePart(params));
+
+    }
     /**
      * Gets the userCourseInstances matching the passed params
      * @param params semesterId, userId
@@ -194,6 +226,18 @@ class DatabaseAdapter {
 
         return promiseQuery.then((result) => {
             return result;
+        });
+    }
+
+    /**
+     * Adds new group to table
+     * @param params
+     */
+    putCourseInstanceGroup(params){
+        let promiseQuery = this.poolPromise.query('INSERT INTO courseinstancegroup ' + this.createInsertPart(params));
+
+        return promiseQuery.then((result) => {
+            return result
         });
     }
 
