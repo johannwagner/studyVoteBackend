@@ -101,7 +101,13 @@ class DatabaseAdapter {
      */
     putCourseInstance(courseInstance)
     {
-        
+        let promiseQuery = this.poolPromise.query('INSERT INTO courseInstance (semesterId, courseId) VALUES ' +
+            '(?,?)',[courseInstance.semesterId, courseInstance.courseId]);
+
+        return promiseQuery.then((result) => {
+            courseInstance.id = result.insertId;
+            return courseInstance;
+        });
     }
 
     /**
@@ -110,16 +116,16 @@ class DatabaseAdapter {
      */
     getCourseInstances(params)
     {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM courseInstance' +
+            this.createWherePart(params));
 
-    }
-
-    /**
-     * Saves the userCourseInstance to the database and returns the userCourseInstance with filled id
-     * @param courseInstance
-     */
-    putCourseInstance(userCourseInstance)
-    {
-
+        return promiseQuery.then((paramsParam) => {
+        if(paramsParam.length <= 0) {
+            return null;
+        } else {
+            return paramsParam[0];
+        }
+      });
     }
 
     /**
@@ -128,7 +134,29 @@ class DatabaseAdapter {
      */
     getUserCourseInstances(params)
     {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM usercourseinstance ' + this.createWherePart(params));
 
+        return promiseQuery.then((paramsParam) => {
+            if(paramsParam.length <= 0) {
+                return null;
+            } else {
+                return paramsParam[0];
+            }
+        });
+    }
+
+    /**
+     * Saves the userCourseInstance matching the passed parameters
+     * @param params courseInstanceId, userId
+     */
+    putUserCourseInstance(params)
+    {
+        let promiseQuery = this.poolPromise.query('INSERT INTO usercourseinstance (userId, courseInstanceId) VALUES (?,?)', [params.userId, params.courseInstanceId]);
+
+        return promiseQuery.then((result) => {
+            params.id = result.insertId;
+            return params;
+        });
     }
 
     /**
@@ -137,7 +165,15 @@ class DatabaseAdapter {
      */
     getCourseInstanceGroups(params)
     {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM courseinstancegroup '+ this.createWherePart(params));
 
+        return promiseQuery.then((paramsParam) => {
+            if(paramsParam.length <= 0) {
+                return null;
+            } else {
+                return paramsParam[0];
+            }
+        });
     }
 
     //endregion
@@ -150,7 +186,12 @@ class DatabaseAdapter {
      */
     putAdmissionRequirement(admissionRequirement)
     {
+        let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirement (courseInstanceId) VALUES (?)', [admissionRequirement.courseInstanceId]);
 
+        return promiseQuery.then((result) => {
+            admissionRequirement.id = result.insertId;
+            return admissionRequirement;
+        });
     }
 
     /**
@@ -159,7 +200,14 @@ class DatabaseAdapter {
      */
     putAdmissionRequirementItem(admissionRequirementItem)
     {
+        let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirement (admissionRequirementType, expireDate, maxTasks, minTasks, minPercentage, mandatory, admissionRequirementId) VALUES (?,?,?,?,?,?,?)', [admissionRequirementItem.admissionRequirementType, admissionRequirementItem.expireDate, admissionRequirementItem.maxTasks, admissionRequirementItem.minTasks, admissionRequirementItem.minPercentage, admissionRequirementItem.mandatory, admissionRequirementItem.admissionRequirementId]);
 
+        //can be further modified if needed
+
+        return promiseQuery.then((result) => {
+            admissionRequirementItem.id = result.insertId;
+            return admissionRequirementItem;
+        });
     }
 
     /**
@@ -168,7 +216,15 @@ class DatabaseAdapter {
      */
     getAdmissionRequirementItems(params)
     {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM admissionrequirementitem' + this.createWherePart(params));
 
+        return promiseQuery.then((paramsParam) => {
+            if(paramsParam.length <= 0) {
+                return null;
+            } else {
+                return paramsParam[0];
+            }
+        });
     }
 
     //endregion
@@ -181,7 +237,12 @@ class DatabaseAdapter {
      */
     putUserProgess(admissionRequirementItem)
     {
+        let promiseQuery = this.poolPromise.query('INSERT INTO userprogress (userId, admissionRequirementItemWeekId, createDate, taskCount) VALUES (?,?,?,?)', [admissionRequirementItem.userId, admissionRequirementItem.admissionRequirementItemWeekId, admissionRequirementItem.createDate, admissionRequirementItem.taskCount]);
 
+        return promiseQuery.then((result) => {
+            admissionRequirementItem.id = result.insertId;
+            return admissionRequirementItem;
+        });
     }
 
     /**
@@ -190,17 +251,38 @@ class DatabaseAdapter {
      */
     getUserProgesses(params)
     {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM userprogress ' + this.createWherePart(params));
 
+        return promiseQuery.then((paramsParam) => {
+            if(paramsParam.length <= 0) {
+                return null;
+            } else {
+                return paramsParam[0];
+            }
+        });
     }
 
     //endregion
 
     //region - Help Methods -
+    /**
+     * Used for lazy creation of insert queries
+     * @param Object of columnNames and values
+     */
+    createInsertPart(params) {
+        let contents = Object.keys(params);
+        if (contents.length <= 0) {
+            return '';
+        }
+
+    }
 
     /**
      * Creates a SQL WHERE String including the passed parameters
      * @param params Object of columnNames and values
      */
+
+
     createWherePart(params)
     {
         if(Object.keys(params).length <= 0) {
