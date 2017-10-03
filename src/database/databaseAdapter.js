@@ -100,6 +100,11 @@ class DatabaseAdapter {
 
     //endregion
 
+    //region - semester
+    //TODO put & get semester, delete usercourseinstance
+
+    //endregion
+
     //region - CourseInstances -
 
     /**
@@ -125,16 +130,25 @@ class DatabaseAdapter {
      */
     getCourseInstances(params)
     {
-        let promiseQuery = this.poolPromise.query('SELECT * FROM courseInstance' +
-            this.createWherePart(params));
+        let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, course.id as course.id2 FROM courseInstance JOIN course ON courseInstance.courseId = course.id ' + this.createWherePart(params));
 
-        return promiseQuery.then((paramsParam) => {
-        if(paramsParam.length <= 0) {
-            return null;
-        } else {
-            return paramsParam;
-        }
-      });
+        return promiseQuery.then((list) => {
+            let result = [];
+            _.forEach(list, (current) => {
+                let temp2 = {
+                    id: current.id2,
+                    shortName: current.shortName,
+                    displayName: current.displayName,
+                    };
+                let temp = {
+                    id: current.id,
+                    course: temp2,
+                    semesterId: current.semesterId,
+                    };
+                result.push(temp)
+                });
+            return result;
+            });
     }
 
     /**
