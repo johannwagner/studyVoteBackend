@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const userRouter = require('./src/routes/userRoute');
 const tokenRouter = require('./src/routes/tokenRoute');
 const userProgressRouter = require('./src/routes/userProgressRoute');
+const courseInstanceRouter = require('./src/routes/courseInstanceRoute');
 
 const expressInstance = express();
 
@@ -18,6 +19,7 @@ expressInstance.use(urlEncodedParser);
 expressInstance.use('/token', tokenRouter);
 expressInstance.use('/user', userRouter);
 expressInstance.use('/userProgress', userProgressRouter);
+expressInstance.use('/courseInstance', courseInstanceRouter);
 
 // TODO: Add Parameter for Port
 expressInstance.listen(1337);

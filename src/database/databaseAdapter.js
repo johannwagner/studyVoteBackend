@@ -137,7 +137,11 @@ class DatabaseAdapter {
      */
     getCourseInstanceGroups(params)
     {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM courseInstanceGroup ' + this.createWherePart(params));
 
+        return promiseQuery.then((result) => {
+            return result;
+        });
     }
 
     //endregion
