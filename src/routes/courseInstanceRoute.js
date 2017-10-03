@@ -13,13 +13,15 @@ const databaseAdapter = new DatabaseAdapter(5);
  * Get Parameter: semesterId, courseId
  * returns: the courseInstances matching the given parameters
  **/
-routerInstance.get('/:id', authenticationMiddleware, (req, res, next) => {
+routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let params = {
-        semesterId: req.headers['semesterid'],
-        courseId: req.params.id
+        semesterId: req.headers['semesterid']
     };
+
+    if(req.params.id)
+        params.id = req.params.id;
 
     // Get the courses matching the given params
     databaseAdapter.getCourseInstances(params).then((courseInstances) => {
@@ -38,11 +40,11 @@ routerInstance.get('/:id', authenticationMiddleware, (req, res, next) => {
  * Save a courseInstance, if the courseId is not filled, create course automatically
  * Put Parameter: semesterId, courseId?, shortName?, displayName?; displayName and ShortName are mandatory if no courseId is passed
  **/
-routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(req, res, next) => {
+routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let courseInstance = {
-        semesterId: req.body.semesterId
+        semesterId: req.headers['semesterid']
     };
 
     // courseId
