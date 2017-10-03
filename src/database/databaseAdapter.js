@@ -93,7 +93,7 @@ class DatabaseAdapter {
             if(paramsParam.length <= 0) {
                 return null;
             } else {
-                return paramsParam[0];
+                return paramsParam;
             }
         });
     }
@@ -132,7 +132,7 @@ class DatabaseAdapter {
         if(paramsParam.length <= 0) {
             return null;
         } else {
-            return paramsParam[0];
+            return paramsParam;
         }
       });
     }
@@ -149,7 +149,7 @@ class DatabaseAdapter {
             if(paramsParam.length <= 0) {
                 return null;
             } else {
-                return paramsParam[0];
+                return paramsParam;
             }
         });
     }
@@ -265,7 +265,7 @@ class DatabaseAdapter {
             if(paramsParam.length <= 0) {
                 return null;
             } else {
-                return paramsParam[0];
+                return paramsParam;
             }
         });
     }
@@ -293,7 +293,7 @@ class DatabaseAdapter {
         }).join();
 
 
-        return '(' + columns + ') VALUES (' + values + ')';
+        return ' (' + columns + ') VALUES (' + values + ')';
     }
 
     /**
