@@ -107,7 +107,8 @@ class DatabaseAdapter {
         let promiseQuery = this.poolPromise.query('INSERT INTO semester ' + this.createInsertPart(semester));
 
         return promiseQuery.then((param) => {
-            return param;
+            semester.id = param.insertId;
+            return semester;
         });
     }
 
@@ -116,7 +117,7 @@ class DatabaseAdapter {
      * @param semester
      */
     getSemester(semester){
-        let promiseQuery = this.poolPromise.query('SELECT * FROM semester '+ this.createInsertPart(semester));
+        let promiseQuery = this.poolPromise.query('SELECT * FROM semester '+ this.createWherePart(semester));
 
         return promiseQuery.then((param) => {
             return param;
