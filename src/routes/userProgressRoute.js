@@ -7,9 +7,21 @@ const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
 
 //region - Get -
-
+/**
+ *
+ */
 routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
-    res.send({message: 'Hallo Fred.', tokenContext: req.tokenContext})
+    let UserProgressTupel = {
+        userId: req.tokenContext.userId,
+        semesterId : req.params.semesterId,
+    }
+
+    databaseAdapter.getCourseUserProgressComplete(UserProgressTupel).then((stats) =>{
+        res.status(200).json(stats);
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
+
 });
 
 //endregion
