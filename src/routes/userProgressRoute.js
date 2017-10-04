@@ -13,7 +13,7 @@ const databaseAdapter = new DatabaseAdapter(5);
 routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
     let UserProgressTupel = {
         userId: req.tokenContext.userId,
-        semesterId : req.params.semesterId,
+        semesterId : Number(req.query.semesterId),
     }
 
     databaseAdapter.getCourseUserProgressComplete(UserProgressTupel).then((stats) =>{
