@@ -35,10 +35,12 @@ class Tests
         if(this.failedCount === 0)
         {
             console.log('Result: Success! Passed all tests');
+            process.exit(0);
         }
         else
         {
             console.log('Result: Failed! ');
+            process.exit(-1);
         }
 
     }

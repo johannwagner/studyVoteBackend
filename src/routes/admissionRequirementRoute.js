@@ -32,6 +32,34 @@ routerInstance.get('/:id?', authenticationMiddleware,  (req, res, next) => {
     });
 });
 
+/**
+ * Get the admissionRequirementItemss matching the given Parameters
+ * Get Parameter: courseInstanceId
+ * @return: admissionRequirement Object, contains a List of admissionRequirementItems
+ **/
+routerInstance.get('/:id/item/:itemId?', authenticationMiddleware,  (req, res, next) => {
+
+    // Check which parameters are passed in the request
+    let params = {};
+
+    // Handle optional Parameters
+    if(req.body.courseInstanceId)
+        params.courseInstanceId = req.body.courseInstanceId;
+
+    if(req.params.id)
+        params['admissionRequirementId'] = req.params.id;
+
+    if(req.params.itemId)
+        params['id'] = req.params.itemId;
+
+    // Get the semesters matching the given params
+    databaseAdapter.getAdmissionRequirementItems(params).then((semesters) => {
+        res.status(200).json(semesters);
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
+});
+
 //endregion
 
 //region - Put -

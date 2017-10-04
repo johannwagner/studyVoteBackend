@@ -9,7 +9,7 @@ const session = {
     //TODO: randomize
     user: {
         displayName: 'Fred',
-        email: '1frsed@feuerstein12.com',
+        email: Math.random() + '@feuerstein12.com',
         passwordHash: 'FredFeuerstein'
     }
 }
@@ -42,6 +42,14 @@ function performTests()
         return getUserProgress();
     }).then(() => {
         return getCourseInstance();
+    }).then(() => {
+        return getCourseInstanceGroup();
+    }).then(() => {
+        return getUserCourseInstance();
+    }).then(() => {
+        return getAdmissionRequirement();
+    }).then(() => {
+        return getAdmissionRequirementItem();
     }).then(() => {
         tests.finish();
     });
@@ -208,7 +216,7 @@ function createUserProgress() {
 
 function getCourseInstanceGroup()
 {
-    return axiosInstance.get('/courseInstance/' + session.courseInstanceId + 'group/' + session.courseInstanceGroupId, { headers: axiosInstance.headers }).then(function (response) {
+    return axiosInstance.get('/courseInstance/' + session.courseInstanceId + '/group/' + session.courseInstanceGroupId, { headers: axiosInstance.headers }).then(function (response) {
 
         if(!response.data || response.data.length != 1 || response.data[0].id !== session.courseInstanceGroupId)
             throw 'courseInstanceGroup Invalid';
@@ -234,17 +242,48 @@ function getCourseInstance()
     });
 }
 
+function getUserCourseInstance()
+{
+    return axiosInstance.get('/userCourseInstance/', { headers: axiosInstance.headers }).then(function (response) {
+
+        if(!response.data || response.data.length != 1 || response.data[0].id !== session.userCourseInstanceId)
+            throw 'userCourseInstanceId Invalid';
+
+        session.courseInstance = response.data[0];
+        tests.passed('Get userCourseInstance');
+    }).catch(function (error) {
+        tests.failed('Get userCourseInstance', error);
+    });
+}
+
 function getAdmissionRequirement()
 {
     return axiosInstance.get('/admissionRequirement/' + session.admissionRequirementId, { headers: axiosInstance.headers }).then(function (response) {
 
-        if(!response.data || response.data.length != 1 || response.data[0].id !== session.courseInstanceId)
-            throw 'courseInstance Invalid';
+        if(!response.data || response.data.length != 1 || response.data[0].id !== session.admissionRequirementId)
+            throw 'admissionRequirement Invalid';
+
+        if(!response.data[0].admissionRequirementItems || response.data[0].admissionRequirementItems.length != 1 || session.admissionRequirementItemId !== response.data[0].admissionRequirementItems[0].id)
+            throw 'admissionRequirementItem Invalid';
 
         session.courseInstance = response.data[0];
-        tests.passed('Get courseInstance');
+        tests.passed('Get admissionRequirement');
     }).catch(function (error) {
-        tests.failed('Get courseInstance', error);
+        tests.failed('Get admissionRequirement', error);
+    });
+}
+
+function getAdmissionRequirementItem()
+{
+    return axiosInstance.get('/admissionRequirement/' + session.admissionRequirementId + '/item/' + session.admissionRequirementItemId, { headers: axiosInstance.headers }).then(function (response) {
+
+        if(!response.data || response.data.length != 1 || response.data[0].id !== session.admissionRequirementItemId)
+            throw 'admissionRequirementItem Invalid';
+
+        session.courseInstance = response.data[0];
+        tests.passed('Get admissionRequirementItem');
+    }).catch(function (error) {
+        tests.failed('Get admissionRequirementItem', error);
     });
 }
 
