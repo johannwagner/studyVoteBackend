@@ -18,7 +18,8 @@ routerInstance.put('/', ensureParametersMiddleware ,(req, res, next) => {
     // Check if User with the given email address already exists
     databaseAdapter.getUser({userMail: req.body.email}).then((user) =>  {
         if(user) {
-            throw Error('User already registered', Constants.ErrorConstants.USER_ALREADY_REGISTERED);
+            throw { message: 'User already registered',
+                code: Constants.ErrorConstants.USER_ALREADY_REGISTERED };
         }
 
         let newUser = {
@@ -38,7 +39,10 @@ routerInstance.put('/', ensureParametersMiddleware ,(req, res, next) => {
         });
 
     }).catch((error) => {
-        res.status(500).json(error);
+        res.status(500).json({
+            error: error.message,
+            errorCode: error.code
+        });
     });
 });
 
