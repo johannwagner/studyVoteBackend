@@ -101,22 +101,107 @@ class DatabaseAdapter {
     //region - progress
     /**
      * Returns weekly progress of a user in a single course, with a bunch of information about it
-     * @param  userid int ID User
-     * @param courseid int ID Course
+     * @param  userProgressTupel
      */
-    getCourseUserProgress(userid , courseinstanceid){
-        let promiseQuery = this.poolPromise.query('SELECT * FROM (SELECT admissionrequirementitem.id as admissionRequirementItemId, admissionrequirementitem.admissionRequirementType, admissionrequirementitem.expireDate, admissionrequirementitem.maxTasks, admissionrequirementitem.minTasks, admissionrequirementitem.minPercentage, admissionrequirementitem.mandatory FROM admissionrequirementitem JOIN (SELECT admissionrequirement.id as notshow FROM admissionrequirement WHERE courseInstanceId = ?) as tempTable1 ON admissionrequirementitem.admissionRequirementId = tempTable1.notshow) as tempTable2 JOIN (SELECT admissionrequirementitemweek.id as admissionrequirementitemweekid, maxCount, creationUserId, admissionRequirementItemID FROM admissionrequirementitemweek JOIN (SELECT admissionRequirementItemWeekID, createDate, taskCount FROM userprogress WHERE userid = ?) as tempTable3 ON tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id) as tempTable4 ON tempTable4.admissionRequirementItemID = tempTable2.admissionRequirementItemId', [courseinstanceid, userid]);
+    getCourseUserProgress(userProgressTupel){
+        let promiseQuery = this.poolPromise.query('SELECT * FROM (SELECT admissionrequirementitem.id as admissionRequirementItemId, admissionrequirementitem.admissionRequirementType, admissionrequirementitem.expireDate, admissionrequirementitem.maxTasks, admissionrequirementitem.minTasks, admissionrequirementitem.minPercentage, admissionrequirementitem.mandatory FROM admissionrequirementitem JOIN (SELECT admissionrequirement.id as notshow FROM admissionrequirement WHERE courseInstanceId = ?) as tempTable1 ON admissionrequirementitem.admissionRequirementId = tempTable1.notshow) as tempTable2 JOIN (SELECT admissionrequirementitemweek.id as admissionrequirementitemweekid, maxCount, creationUserId, admissionRequirementItemID FROM admissionrequirementitemweek JOIN (SELECT admissionRequirementItemWeekID, createDate, taskCount FROM userprogress WHERE userid = ?) as tempTable3 ON tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id) as tempTable4 ON tempTable4.admissionRequirementItemID = tempTable2.admissionRequirementItemId', [userProgressTupel.courseInstanceId, userProgressTupel.userId]);
 
         return promiseQuery;
     }
 
     /**
      * Returns combined progress of a user in a single course, Column 1 & 2 for maximum Task and minimum for admission, Column 3 for solved tasks, column 4 for all till now admissioned tasks
-     * @param userid int UserID
-     * @param courseinstanceid int CourseInstanceID
+     * @param userProgressTupel
      */
-    getCourseProgressComplete(userid, courseinstanceid){
-        let promiseQuery = this.poolPromise.query('SELECT maxTasks, minTasks, SUM(taskCount), SUM(maxCount) FROM (SELECT admissionrequirementitem.id AS admissionRequirementItemId, admissionrequirementitem.maxTasks, admissionrequirementitem.minTasks FROM admissionrequirementitem JOIN(SELECT admissionrequirement.id AS notshow FROM admissionrequirement WHERE courseInstanceId = ? ) AS tempTable1 ON admissionrequirementitem.admissionRequirementId = tempTable1.notshow ) AS tempTable2 JOIN( SELECT admissionrequirementitemweek.id AS admissionrequirementitemweekid, maxCount, creationUserId, admissionRequirementItemID, taskCount FROM admissionrequirementitemweek JOIN( SELECT admissionRequirementItemWeekID, createDate, taskCount FROM userprogress WHERE userid = ? ) AS tempTable3 ON tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id ) AS tempTable4 ON tempTable4.admissionRequirementItemID = tempTable2.admissionRequirementItemId',[courseinstanceid, userid]);
+    getCourseUserProgressComplete(userProgressTupel){
+        let promiseQuery = this.poolPromise.query('SELECT\n' +
+            '    uuCIcIcaRaRI.displayName,\n' +
+            '    uuCIcIcaRaRI.shortName,\n' +
+            '    uuCIcIcaRaRI.minPercentage,\n' +
+            '    uuCIcIcaRaRI.minTasks,\n' +
+            '    uuCIcIcaRaRI.maxTasks,\n' +
+            '    SUM(taskCount),\n' +
+            '    SUM(maxCount)\n' +
+            'FROM\n' +
+            '    (\n' +
+            '    SELECT\n' +
+            '        admissionrequirementitem.id,\n' +
+            '        uuCIcIcaR.displayName,\n' +
+            '        uuCIcIcaR.shortName,\n' +
+            '        admissionrequirementitem.minTasks,\n' +
+            '        admissionrequirementitem.maxTasks,\n' +
+            '        admissionrequirementitem.minPercentage,\n' +
+            '        uuCIcIcaR.courseInstanceId\n' +
+            '    FROM\n' +
+            '        admissionrequirementitem\n' +
+            '    JOIN(\n' +
+            '        SELECT\n' +
+            '            admissionrequirement.id,\n' +
+            '            admissionrequirement.courseInstanceId,\n' +
+            '            uuCIcIc.displayName,\n' +
+            '            uuCIcIc.shortName\n' +
+            '        FROM\n' +
+            '            admissionrequirement\n' +
+            '        JOIN(\n' +
+            '            SELECT\n' +
+            '                course.displayName,\n' +
+            '                course.shortName,\n' +
+            '                uuCIcI.id\n' +
+            '            FROM\n' +
+            '                course\n' +
+            '            JOIN(\n' +
+            '                SELECT\n' +
+            '                    courseinstance.courseId,\n' +
+            '                    courseinstance.id\n' +
+            '                FROM\n' +
+            '                    courseinstance\n' +
+            '                JOIN(\n' +
+            '                    SELECT\n' +
+            '                        usercourseinstance.courseInstanceId\n' +
+            '                    FROM\n' +
+            '                        usercourseinstance\n' +
+            '                    WHERE\n' +
+            '                        userId = 1\n' +
+            '                ) AS uuCI\n' +
+            '                ON\n' +
+            '                    courseinstance.id = uuCI.courseInstanceId\n' +
+            '            ) AS uuCIcI\n' +
+            '            ON\n' +
+            '                uuCIcI.courseId = course.id\n' +
+            '        ) AS uuCIcIc\n' +
+            '        ON\n' +
+            '            uuCIcIc.id = admissionrequirement.id\n' +
+            '    ) AS uuCIcIcaR\n' +
+            'ON\n' +
+            '    uuCIcIcaR.id = admissionrequirementitem.admissionRequirementId\n' +
+            'WHERE\n' +
+            '    admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionRequirementType = 0\n' +
+            ') AS uuCIcIcaRaRI\n' +
+            'JOIN(\n' +
+            '    SELECT\n' +
+            '        admissionrequirementitemweek.id AS admissionrequirementitemweekid,\n' +
+            '        maxCount,\n' +
+            '        creationUserId,\n' +
+            '        admissionRequirementItemID,\n' +
+            '        taskCount\n' +
+            '    FROM\n' +
+            '        admissionrequirementitemweek\n' +
+            '    JOIN(\n' +
+            '        SELECT\n' +
+            '            admissionRequirementItemWeekID,\n' +
+            '            taskCount\n' +
+            '        FROM\n' +
+            '            userprogress\n' +
+            '        WHERE\n' +
+            '            userid = ?\n' +
+            '    ) AS tempTable3\n' +
+            'ON\n' +
+            '    tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id\n' +
+            ') AS tempTable4\n' +
+            'ON\n' +
+            '    tempTable4.admissionRequirementItemID = uuCIcIcaRaRI.id\n' +
+            'GROUP BY\n' +
+            '    uuCIcIcaRaRI.courseInstanceId',[userProgressTupel.userId]);
 
         return promiseQuery;
     }
@@ -305,9 +390,7 @@ class DatabaseAdapter {
     {
         let promiseQuery = this.poolPromise.query('SELECT * FROM admissionRequirementItem ' + this.createWherePart(params));
 
-        return promiseQuery.then((result) => {
-            return result;
-        });
+        return promiseQuery;
     }
 
     /**
@@ -371,13 +454,7 @@ class DatabaseAdapter {
     {
         let promiseQuery = this.poolPromise.query('SELECT * FROM userprogress ' + this.createWherePart(params));
 
-        return promiseQuery.then((paramsParam) => {
-            if(paramsParam.length <= 0) {
-                return null;
-            } else {
-                return paramsParam;
-            }
-        });
+        return promiseQuery;
     }
 
     //endregion
