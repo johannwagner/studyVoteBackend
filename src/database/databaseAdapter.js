@@ -298,6 +298,20 @@ class DatabaseAdapter {
     }
 
     /**
+     * Saves the admissionRequirementItemWeek to the database and returns the admissionRequirementItem with filled id
+     * @param admissionRequirementItem
+     */
+    putAdmissionRequirementItemWeek(admissionRequirementItemWeek)
+    {
+        let promiseQuery = this.poolPromise.query('INSERT INTO admissionRequirementItemWeek ' + this.createInsertPart(admissionRequirementItemWeek));
+
+        return promiseQuery.then((result) => {
+            admissionRequirementItemWeek.id = result.insertId;
+            return admissionRequirementItemWeek;
+        });
+    }
+
+    /**
      * Gets the admissionRequirementItems matching the passed params
      * @param params courseInstanceId
      */
@@ -355,6 +369,19 @@ class DatabaseAdapter {
         });
     }
 
+
+    /**
+     * Gets the admissionRequirementItemWeekss matching the passed params
+     * @param params
+     */
+    getAdmissionRequirementItemWeeks(params)
+    {
+        let promiseQuery = this.poolPromise.query('SELECT * FROM admissionRequirementItemWeek ' + this.createWherePart(params));
+
+        return promiseQuery.then((result) => {
+            return result;
+        });
+    }
 
     //endregion
 
