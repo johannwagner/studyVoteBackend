@@ -115,12 +115,16 @@ class DatabaseAdapter {
      */
     getCourseUserProgressComplete(userProgressTupel){
         let promiseQuery = this.poolPromise.query('SELECT\n' +
+            '    uuCIcIcaRaRI.courseInstanceId,\n' +
             '    uuCIcIcaRaRI.displayName,\n' +
             '    uuCIcIcaRaRI.shortName,\n' +
             '    uuCIcIcaRaRI.minPercentage,\n' +
             '    uuCIcIcaRaRI.minTasks,\n' +
             '    uuCIcIcaRaRI.maxTasks,\n' +
-            '    uuCIcIcaRaRI.courseInstanceId,\n' +
+            '    uuCIcIcaRaRI.endDate,\n' +
+            '    uuCIcIcaRaRI.semesterName,\n' +
+            '    uuCIcIcaRaRI.room,\n' +
+            '    uuCIcIcaRaRI.docent,\n' +
             '    SUM(taskCount),\n' +
             '    SUM(maxCount)\n' +
             'FROM\n' +
@@ -132,7 +136,11 @@ class DatabaseAdapter {
             '        admissionrequirementitem.minTasks,\n' +
             '        admissionrequirementitem.maxTasks,\n' +
             '        admissionrequirementitem.minPercentage,\n' +
-            '        uuCIcIcaR.courseInstanceId\n' +
+            '        uuCIcIcaR.courseInstanceId,\n' +
+            '        uuCIcIcaR.endDate,\n' +
+            '        uuCIcIcaR.semesterName,\n' +
+            '        uuCIcIcaR.room,\n' +
+            '        uuCIcIcaR.docent\n' +
             '    FROM\n' +
             '        admissionrequirementitem\n' +
             '    JOIN(\n' +
@@ -140,41 +148,69 @@ class DatabaseAdapter {
             '            admissionrequirement.id,\n' +
             '            admissionrequirement.courseInstanceId,\n' +
             '            uuCIcIc.displayName,\n' +
-            '            uuCIcIc.shortName\n' +
+            '            uuCIcIc.shortName,\n' +
+            '            uuCIcIc.endDate,\n' +
+            '            uuCIcIc.semesterName,\n' +
+            '            uuCIcIc.room,\n' +
+            '            uuCIcIc.docent\n' +
             '        FROM\n' +
             '            admissionrequirement\n' +
             '        JOIN(\n' +
             '            SELECT\n' +
-            '                course.displayName,\n' +
-            '                course.shortName,\n' +
-            '                uuCIcI.id\n' +
+            '                uuCIcI2.displayName,\n' +
+            '                uuCIcI2.shortName,\n' +
+            '                uuCIcI2.id,\n' +
+            '                semester.endDate,\n' +
+            '                semester.displayName AS semesterName,\n' +
+            '                uuCIcI2.room,\n' +
+            '                uuCIcI2.docent\n' +
             '            FROM\n' +
-            '                course\n' +
+            '                semester\n' +
             '            JOIN(\n' +
             '                SELECT\n' +
-            '                    courseinstance.courseId,\n' +
-            '                    courseinstance.id\n' +
+            '                    course.displayName,\n' +
+            '                    course.shortName,\n' +
+            '                    uuCIcI.semesterId,\n' +
+            '                    uuCIcI.id,\n' +
+            '                    uuCIcI.room,\n' +
+            '                    uuCIcI.docent\n' +
             '                FROM\n' +
-            '                    courseinstance\n' +
+            '                    course\n' +
             '                JOIN(\n' +
             '                    SELECT\n' +
-            '                        usercourseinstance.courseInstanceId\n' +
+            '                        courseinstance.courseId,\n' +
+            '                        courseinstance.id,\n' +
+            '                        courseinstance.semesterId,\n' +
+            '                        courseinstance.room,\n' +
+            '                        courseinstance.docent\n' +
             '                    FROM\n' +
-            '                        usercourseinstance\n' +
-            '                    WHERE\n' +
-            '                        userId = ?\n' +
-            '                ) AS uuCI\n' +
+            '                        courseinstance\n' +
+            '                    JOIN(\n' +
+            '                        SELECT\n' +
+            '                            usercourseinstance.courseInstanceId\n' +
+            '                        FROM\n' +
+            '                            usercourseinstance\n' +
+            '                        WHERE\n' +
+            '                            userId = ?\n' +
+            '                    ) AS uuCI\n' +
             '                ON\n' +
             '                    courseinstance.id = uuCI.courseInstanceId\n' +
-            '            ) AS uuCIcI\n' +
+            '                ) AS uuCIcI\n' +
             '            ON\n' +
             '                uuCIcI.courseId = course.id\n' +
-            '        ) AS uuCIcIc\n' +
+            '            ) AS uuCIcI2\n' +
             '        ON\n' +
-            '            uuCIcIc.id = admissionrequirement.courseInstanceId\n' +
+            '            uuCIcI2.semesterId = semester.id\n' +
+            '        WHERE\n' +
+            '            semester.id = ?\n' +
+            '        ) AS uuCIcIc\n' +
+            '    ON\n' +
+            '        uuCIcIc.id = admissionrequirement.courseInstanceId\n' +
             '    ) AS uuCIcIcaR\n' +
             'ON\n' +
             '    uuCIcIcaR.id = admissionrequirementitem.admissionRequirementId\n' +
+            'WHERE\n' +
+            '    admissionrequirementitem.admissionRequirementType = 0 AND admissionrequirementitem.mandatory = 1\n' +
             ') AS uuCIcIcaRaRI\n' +
             'JOIN(\n' +
             '    SELECT\n' +
@@ -200,7 +236,7 @@ class DatabaseAdapter {
             'ON\n' +
             '    tempTable4.admissionRequirementItemID = uuCIcIcaRaRI.id\n' +
             'GROUP BY\n' +
-            '    uuCIcIcaRaRI.courseInstanceId',[userProgressTupel.userId, userProgressTupel.userId]);
+            '    uuCIcIcaRaRI.courseInstanceId',[userProgressTupel.userId, userProgressTupel.semesterId,userProgressTupel.userId]);
 
         return promiseQuery;
     }
