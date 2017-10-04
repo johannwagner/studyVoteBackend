@@ -12,11 +12,11 @@ const databaseAdapter = new DatabaseAdapter(5);
  */
 routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
     let UserProgressTupel = {
-        userId: req.body.userId,
+        userId: req.tokenContext.userId,
     }
 
     databaseAdapter.getCourseUserProgressComplete(UserProgressTupel).then((stats) =>{
-        res.send(200).json(stats);
+        res.status(200).json(stats);
     }).catch((error) => {
         res.status(500).json(error);
     });
