@@ -27,8 +27,13 @@ class DatabaseAdapter {
         let promiseQuery;
 
         if(userParams.userMail){
-            promiseQuery = this.poolPromise.query('SELECT * FROM user WHERE email = ?', [userParams.userMail])
-        } else {
+            promiseQuery = this.poolPromise.query('SELECT * FROM user WHERE ' +
+                'email = ?', [userParams.userMail])
+        } else if (userParams.userId) {
+            promiseQuery = this.poolPromise.query('SELECT * FROM user WHERE ' +
+                'id = ?', [userParams.userId])
+        }
+        else {
             throw Error('Wrong Params.');
         }
 
@@ -173,27 +178,24 @@ class DatabaseAdapter {
     {
         let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, course.id as id2, semester.id as id3, semester.displayName as semesterName, semester.startDate, semester.endDate FROM courseInstance JOIN semester ON courseInstance.semesterId = semester.id JOIN course ON courseInstance.courseId = course.id ' + this.createWherePart(params));
 
-        return promiseQuery.then((list) => {
-            let result = [];
-            _.forEach(list, (current) => {
-                let temp = {
-                    id: current.id,
+        return promiseQuery.then((resultList) => {
+            return _.map(resultList, (rItem) => {
+                return {
+                    id: rItem.id,
                     course: {
-                        id: current.id2,
-                        shortName: current.shortName,
-                        displayName: current.displayName,
+                        id: rItem.id2,
+                        shortName: rItem.shortName,
+                        displayName: rItem.displayName,
                     },
                     semester: {
-                        id : current.id3,
-                        semesterName : current.semesterName,
-                        semesterStart : current.startDate,
-                        semesterEnd : current.endDate,
+                        id: rItem.id3,
+                        semesterName: rItem.semesterName,
+                        semesterStart: rItem.startDate,
+                        semesterEnd: rItem.endDate,
                     },
-                    };
-                result.push(temp)
-                });
-            return result;
+                };
             });
+        });
     }
 
     /**
@@ -307,6 +309,39 @@ class DatabaseAdapter {
             return result;
         });
     }
+
+    /**
+     * Gets the admissionRequirements matching the passed params with a list of its Items
+     * @param params courseInstanceId
+     */
+    getAdmissionRequirements(params)
+    {
+        let promiseQuery = this.poolPromise.query('SELECT ar.id AS id, ar.courseInstanceId, arItem.id AS itemId, arItem.admissionRequirementType, ' +
+            'arItem.expireDate, arItem.minTasks, arItem.maxTasks, arItem.minPercentage, arItem.mandatory FROM admissionRequirement ar ' +
+            'INNER JOIN  admissionRequirementItem arItem ON ar.id = arItem.admissionRequirementId' + this.createWherePart(params));
+
+        return promiseQuery.then((list) => {
+            let result = [];
+            _.forEach(list, (current) => {
+                let temp = {
+                    id: current.id,
+                    courseInstanceId: current.courseInstanceId,
+                    admissionRequirementItem : {
+                        id: current.itemId,
+                        admissionRequirementType: current.admissionRequirementType,
+                        expireDate: current.expireDate,
+                        minTasks: current.minTasks,
+                        maxTasks: current.maxTasks,
+                        minPercentage: current.minPercentage,
+                        mandatory: current.mandatory
+                    }
+                };
+                result.push(temp)
+            });
+            return result;
+        });
+    }
+
 
     //endregion
 

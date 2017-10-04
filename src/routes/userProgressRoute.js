@@ -2,7 +2,7 @@ const express = require('express');
 const routerInstance = express.Router();
 const Constants = require('../Constants');
 const authenticationMiddleware = require('../middleware/authenticationMiddleware').authenticationMiddleware;
-const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['email', 'displayName', 'passwordHash']);
+const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['admissionRequirementItemId']);
 const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
 

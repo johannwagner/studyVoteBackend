@@ -7,6 +7,20 @@ const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
 const createSignedToken = require('../helper/tokenhelper').createSignedToken;
 
+
+//region - Get -
+
+routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
+    databaseAdapter.getUser({userId: req.tokenContext.userId}).then((user) => {
+        user.passwordHash = null;
+        res.status(200).json(user);
+    }).catch((error) => {
+        res.status(500).json(error);
+    })
+});
+
+//endregion
+
 //region - Put -
 
 /**
@@ -54,9 +68,7 @@ routerInstance.delete('/', (req, res, next) => {
     res.status(403).send('not implemented');
 });
 
-routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
-    res.status(403).send('not implemented');
-});
+
 
 routerInstance.post('/', (req, res, next) => {
     res.status(403).send('not implemented');
