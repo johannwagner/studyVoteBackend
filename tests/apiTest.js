@@ -41,6 +41,8 @@ function performTests()
     }).then(() => {
         return getUserProgress();
     }).then(() => {
+        return getCourseInstance();
+    }).then(() => {
         tests.finish();
     });
 }
@@ -204,12 +206,50 @@ function createUserProgress() {
 
 //region - Get -
 
+function getCourseInstanceGroup()
+{
+    return axiosInstance.get('/courseInstance/' + session.courseInstanceId + 'group/' + session.courseInstanceGroupId, { headers: axiosInstance.headers }).then(function (response) {
+
+        if(!response.data || response.data.length != 1 || response.data[0].id !== session.courseInstanceGroupId)
+            throw 'courseInstanceGroup Invalid';
+
+        session.courseInstanceGroup = response.data[0];
+        tests.passed('Get courseInstanceGroup');
+    }).catch(function (error) {
+        tests.failed('Get courseInstanceGroup', error);
+    });
+}
+
+function getCourseInstance()
+{
+    return axiosInstance.get('/courseInstance/' + session.courseInstanceId, { headers: axiosInstance.headers }).then(function (response) {
+
+        if(!response.data || response.data.length != 1 || response.data[0].id !== session.courseInstanceId)
+            throw 'courseInstance Invalid';
+
+        session.courseInstance = response.data[0];
+        tests.passed('Get courseInstance');
+    }).catch(function (error) {
+        tests.failed('Get courseInstance', error);
+    });
+}
+
+function getAdmissionRequirement()
+{
+    return axiosInstance.get('/admissionRequirement/' + session.admissionRequirementId, { headers: axiosInstance.headers }).then(function (response) {
+
+        if(!response.data || response.data.length != 1 || response.data[0].id !== session.courseInstanceId)
+            throw 'courseInstance Invalid';
+
+        session.courseInstance = response.data[0];
+        tests.passed('Get courseInstance');
+    }).catch(function (error) {
+        tests.failed('Get courseInstance', error);
+    });
+}
+
 function getUserProgress()
 {
-    let data = {
-        semesterId: session.semesterId
-    };
-
     return axiosInstance.get('/userProgress?semesterId=' + session.semesterId, { headers: axiosInstance.headers }).then(function (response) {
 
         //session.userProgressId2 = response.data;
