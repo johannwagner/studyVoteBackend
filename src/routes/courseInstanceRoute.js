@@ -17,7 +17,7 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let params = {
-        semesterId: req.headers['semesterid']
+        semesterId: req.query.semesterId
     };
 
     if(req.params.id)
