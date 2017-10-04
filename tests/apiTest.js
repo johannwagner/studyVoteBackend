@@ -39,6 +39,8 @@ function performTests()
     }).then(() => {
         return createUserProgress();
     }).then(() => {
+        return getUserProgress();
+    }).then(() => {
         tests.finish();
     });
 }
@@ -54,9 +56,9 @@ function createUser() {
         if(!session.token)
             throw 'Token Invalid';
 
-        tests.passed('CREATE USER');
+        tests.passed('Create user');
     }).catch(function (error) {
-        tests.failed('CREATE USER', error);
+        tests.failed('Create user', error);
     });
 }
 
@@ -70,9 +72,9 @@ function loginUser() {
         axiosInstance.headers = {};
         axiosInstance.headers['x-token'] = session.token;
 
-        tests.passed('LOGIN USER');
+        tests.passed('Login user');
     }).catch(function (error) {
-        tests.failed('LOGIN USER', error);
+        tests.failed('Login user', error);
     });
 }
 
@@ -89,9 +91,9 @@ function createSemester() {
         if(!session.semesterId)
             throw 'semesterId Invalid';
 
-        tests.passed('CREATE SEMESTER');
+        tests.passed('Create semester');
     }).catch(function (error) {
-        tests.failed('CREATE SEMESTER', error);
+        tests.failed('Create semester', error);
     });
 }
 
@@ -108,9 +110,9 @@ function createCourseInstance() {
         if(!session.courseInstanceId)
             throw 'courseInstanceId Invalid';
 
-        tests.passed('CREATE COURSE INSTANCE');
+        tests.passed('Create courseInstance');
     }).catch(function (error) {
-        tests.failed('CREATE COURSE INSTANCE', error);
+        tests.failed('Create courseInstance', error);
     });
 }
 
@@ -128,9 +130,9 @@ function createCourseInstanceGroup() {
         if(!session.courseInstanceGroupId)
             throw 'courseInstanceGroupId Invalid';
 
-        tests.passed('CREATE COURSE INSTANCE GROUP');
+        tests.passed('Create courseInstanceGroup');
     }).catch(function (error) {
-        tests.failed('CREATE COURSE INSTANCE GROUP', error);
+        tests.failed('Create courseInstanceGroup', error);
     });
 }
 
@@ -146,9 +148,9 @@ function createUserCourseInstance() {
         if(!session.userCourseInstanceId)
             throw 'userCourseInstanceId Invalid';
 
-        tests.passed('CREATE USER COURSE INSTANCE');
+        tests.passed('Create userCourseInstance');
     }).catch(function (error) {
-        tests.failed('CREATE USER COURSE INSTANCE', error);
+        tests.failed('Create userCourseInstance', error);
     });
 }
 
@@ -172,9 +174,9 @@ function createAdmissionRequirementItem() {
         if(!session.admissionRequirementId)
             throw 'admissionRequirementId Invalid';
 
-        tests.passed('CREATE ADMISSION REQUIREMENT ITEM');
+        tests.passed('Create admissionRequirementItem');
     }).catch(function (error) {
-        tests.failed('CREATE ADMISSION REQUIREMENT ITEM', error);
+        tests.failed('Create admissionRequirementItem', error);
     });
 }
 
@@ -192,15 +194,36 @@ function createUserProgress() {
         if(!session.userProgressId)
             throw 'userProgressId Invalid';
 
-        tests.passed('CREATE USER PROGRESS');
+        tests.passed('Create userProgress');
     }).catch(function (error) {
-        tests.failed('CREATE USER PROGRESS', error);
+        tests.failed('Create userProgress', error);
     });
 }
 
 //endregion
 
 //region - Get -
+
+function getUserProgress()
+{
+    let data = {
+        semesterId: session.semesterId
+    };
+
+    return axiosInstance.get('/userProgress?semesterId=' + session.semesterId, { headers: axiosInstance.headers }).then(function (response) {
+
+        //session.userProgressId2 = response.data;
+        if(!response.data || response.data.length != 1)
+            throw 'userProgress Invalid';
+
+        session.userProgress = response.data[0];
+        tests.passed('Get userProgress');
+    }).catch(function (error) {
+        tests.failed('Get userProgress', error);
+    });
+}
+
+
 
 //endregion
 
