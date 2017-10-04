@@ -120,6 +120,7 @@ class DatabaseAdapter {
             '    uuCIcIcaRaRI.minPercentage,\n' +
             '    uuCIcIcaRaRI.minTasks,\n' +
             '    uuCIcIcaRaRI.maxTasks,\n' +
+            '    uuCIcIcaRaRI.courseInstanceId,\n' +
             '    SUM(taskCount),\n' +
             '    SUM(maxCount)\n' +
             'FROM\n' +
