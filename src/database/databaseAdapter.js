@@ -292,6 +292,39 @@ class DatabaseAdapter {
         });
     }
 
+    /**
+     * Gets the admissionRequirements matching the passed params with a list of its Items
+     * @param params courseInstanceId
+     */
+    getAdmissionRequirements(params)
+    {
+        let promiseQuery = this.poolPromise.query('SELECT ar.id AS id, ar.courseInstanceId, arItem.id AS itemId, arItem.admissionRequirementType, ' +
+            'arItem.expireDate, arItem.minTasks, arItem.maxTasks, arItem.minPercentage, arItem.mandatory FROM admissionRequirement ar ' +
+            'INNER JOIN  admissionRequirementItem arItem ON ar.id = arItem.admissionRequirementId' + this.createWherePart(params));
+
+        return promiseQuery.then((list) => {
+            let result = [];
+            _.forEach(list, (current) => {
+                let temp = {
+                    id: current.id,
+                    courseInstanceId: current.courseInstanceId,
+                    admissionRequirementItem : {
+                        id: current.itemId,
+                        admissionRequirementType: current.admissionRequirementType,
+                        expireDate: current.expireDate,
+                        minTasks: current.minTasks,
+                        maxTasks: current.maxTasks,
+                        minPercentage: current.minPercentage,
+                        mandatory: current.mandatory
+                    }
+                };
+                result.push(temp)
+            });
+            return result;
+        });
+    }
+
+
     //endregion
 
     //region - UserProgess -
