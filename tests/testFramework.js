@@ -21,7 +21,7 @@ class Tests
     failed(name, error)
     {
         this.failedCount++;
-        console.log('Test #' + this.count() + ' ' + name + ': failed with error ' + error);
+        console.log('Test #' + this.count() + ' ' + name + ': failed: ' + error);
     }
 
     start()
