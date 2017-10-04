@@ -497,11 +497,12 @@ class DatabaseAdapter {
      * Adds new group to table
      * @param params
      */
-    putCourseInstanceGroup(params){
-        let promiseQuery = this.poolPromise.query('INSERT INTO courseinstancegroup ' + this.createInsertPart(params));
+    putCourseInstanceGroup(courseInstanceGroup){
+        let promiseQuery = this.poolPromise.query('INSERT INTO courseinstancegroup ' + this.createInsertPart(courseInstanceGroup));
 
         return promiseQuery.then((result) => {
-            return result
+            courseInstanceGroup.id =  result.insertId;
+            return  courseInstanceGroup;
         });
     }
 
