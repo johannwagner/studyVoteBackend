@@ -100,16 +100,25 @@ class DatabaseAdapter {
 
     //region - progress
     /**
-     * Returns combined process of user in a single course
+     * Returns weekly progress of a user in a single course, with a bunch of information about it
      * @param  userid int ID User
      * @param courseid int ID Course
      */
     getCourseUserProgress(userid , courseinstanceid){
-        let promiseQuery = this.poolPromise.query('SELECT * FROM (SELECT admissionrequirementitem.id as admissionRequirementItemId, admissionrequirementitem.admissionRequirementType, admissionrequirementitem.expireDate, admissionrequirementitem.maxTasks, admissionrequirementitem.minTasks, admissionrequirementitem.minPercentage, admissionrequirementitem.mandatory FROM admissionrequirementitem JOIN (SELECT admissionrequirement.id as notshow FROM admissionrequirement WHERE courseInstanceId = ?) as tempTable1 ON admissionrequirementitem.admissionRequirementId = tempTable1.notshow) as tempTable2 JOIN (SELECT admissionrequirementitemweek.id as admissionrequirementitemweekid, maxCount, creationUserId, admissionRequirementItemID FROM admissionrequirementitemweek JOIN (SELECT admissionRequirementItemWeekID, createDate, taskCount FROM userprogress WHERE userid = ?) as tempTable3 ON tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id) as tempTable4 ON tempTable4.admissionRequirementItemID = tempTable2.admissionRequirementItemId', [userid, courseinstanceid]);
+        let promiseQuery = this.poolPromise.query('SELECT * FROM (SELECT admissionrequirementitem.id as admissionRequirementItemId, admissionrequirementitem.admissionRequirementType, admissionrequirementitem.expireDate, admissionrequirementitem.maxTasks, admissionrequirementitem.minTasks, admissionrequirementitem.minPercentage, admissionrequirementitem.mandatory FROM admissionrequirementitem JOIN (SELECT admissionrequirement.id as notshow FROM admissionrequirement WHERE courseInstanceId = ?) as tempTable1 ON admissionrequirementitem.admissionRequirementId = tempTable1.notshow) as tempTable2 JOIN (SELECT admissionrequirementitemweek.id as admissionrequirementitemweekid, maxCount, creationUserId, admissionRequirementItemID FROM admissionrequirementitemweek JOIN (SELECT admissionRequirementItemWeekID, createDate, taskCount FROM userprogress WHERE userid = ?) as tempTable3 ON tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id) as tempTable4 ON tempTable4.admissionRequirementItemID = tempTable2.admissionRequirementItemId', [courseinstanceid, userid]);
 
-        return promiseQuery.then((result) => {
-            return result
-        });
+        return promiseQuery;
+    }
+
+    /**
+     * Returns combined progress of a user in a single course, Column 1 & 2 for maximum Task and minimum for admission, Column 3 for solved tasks, column 4 for all till now admissioned tasks
+     * @param userid int UserID
+     * @param courseinstanceid int CourseInstanceID
+     */
+    getCourseProgressComplete(userid, courseinstanceid){
+        let promiseQuery = this.poolPromise.query('SELECT maxTasks, minTasks, SUM(taskCount), SUM(maxCount) FROM (SELECT admissionrequirementitem.id AS admissionRequirementItemId, admissionrequirementitem.maxTasks, admissionrequirementitem.minTasks FROM admissionrequirementitem JOIN(SELECT admissionrequirement.id AS notshow FROM admissionrequirement WHERE courseInstanceId = ? ) AS tempTable1 ON admissionrequirementitem.admissionRequirementId = tempTable1.notshow ) AS tempTable2 JOIN( SELECT admissionrequirementitemweek.id AS admissionrequirementitemweekid, maxCount, creationUserId, admissionRequirementItemID, taskCount FROM admissionrequirementitemweek JOIN( SELECT admissionRequirementItemWeekID, createDate, taskCount FROM userprogress WHERE userid = ? ) AS tempTable3 ON tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id ) AS tempTable4 ON tempTable4.admissionRequirementItemID = tempTable2.admissionRequirementItemId',[courseinstanceid, userid]);
+
+        return promiseQuery;
     }
 
     //endregion
