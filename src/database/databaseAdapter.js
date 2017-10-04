@@ -48,10 +48,6 @@ class DatabaseAdapter {
      */
     putUser(user)
     {
-        /*let promiseQuery = this.poolPromise.query('INSERT INTO user (email,' +
-            ' displayName, passwordHash) VALUES(?, ?, ?)',
-            [user.email, user.displayName, user.passwordHash]);
-*/
         let promiseQuery = this.poolPromise.query('INSERT INTO user ' + this.createInsertPart(user));
 
         return promiseQuery.then((result) => {
@@ -97,8 +93,23 @@ class DatabaseAdapter {
 
     //endregion
 
+    //region - progress
+    /**
+     * Returns combined process of user in a single course
+     * @param  userid int ID User
+     * @param courseid int ID Course
+     */
+    getCourseUserProgress(userid , courseinstanceid){
+        let promiseQuery = this.poolPromise.query('SELECT * FROM (SELECT admissionrequirementitem.id as admissionRequirementItemId, admissionrequirementitem.admissionRequirementType, admissionrequirementitem.expireDate, admissionrequirementitem.maxTasks, admissionrequirementitem.minTasks, admissionrequirementitem.minPercentage, admissionrequirementitem.mandatory FROM admissionrequirementitem JOIN (SELECT admissionrequirement.id as notshow FROM admissionrequirement WHERE courseInstanceId = ?) as tempTable1 ON admissionrequirementitem.admissionRequirementId = tempTable1.notshow) as tempTable2 JOIN (SELECT admissionrequirementitemweek.id as admissionrequirementitemweekid, maxCount, creationUserId, admissionRequirementItemID FROM admissionrequirementitemweek JOIN (SELECT admissionRequirementItemWeekID, createDate, taskCount FROM userprogress WHERE userid = ?) as tempTable3 ON tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id) as tempTable4 ON tempTable4.admissionRequirementItemID = tempTable2.admissionRequirementItemId', [userid, courseinstanceid]);
+
+        return promiseQuery.then((result) => {
+            return result
+        });
+    }
+
+    //endregion
+
     //region - semester
-    //TODO  course instance group
     /**
      * Adds new semester to table, returns new entry
      * @param semester
@@ -193,11 +204,7 @@ class DatabaseAdapter {
         let promiseQuery = this.poolPromise.query('SELECT * FROM usercourseinstance ' + this.createWherePart(params));
 
         return promiseQuery.then((paramsParam) => {
-            if(paramsParam.length <= 0) {
-                return null;
-            } else {
                 return paramsParam;
-            }
         });
     }
 
