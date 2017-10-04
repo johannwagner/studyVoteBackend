@@ -11,9 +11,15 @@ const debugRouter = require('./src/routes/debugRoute');
 const expressInstance = express();
 const http = require('http');
 
+const cors = require('cors');
+
+
 // Parses for JSON and UrlEncoded Parameters
 const jsonParser = bodyParser.json();
 const urlEncodedParser = bodyParser.urlencoded({extended: false});
+
+// Adding CORS
+expressInstance.use(cors())
 
 // Adding Parsers for Argument
 expressInstance.use(jsonParser);
