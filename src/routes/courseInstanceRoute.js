@@ -17,13 +17,17 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let params = {
-        semesterId: req.query.semesterId
+
     };
 
-    if(req.params.id)
-        params.id = req.params.id;
+    // Handle optional Parameters
+    if(req.query['semesterId'])
+        semesterId: req.query['semesterId'];
 
-    // Get the courses matching the given params
+    if(req.params.id)
+        params['courseInstance.id'] = req.params.id;
+
+    // Get the courseInstances matching the given params
     databaseAdapter.getCourseInstances(params).then((courseInstances) => {
         res.status(200).json(courseInstances);
 
