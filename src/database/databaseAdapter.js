@@ -162,7 +162,7 @@ class DatabaseAdapter {
             '                    FROM\n' +
             '                        usercourseinstance\n' +
             '                    WHERE\n' +
-            '                        userId = 1\n' +
+            '                        userId = ?\n' +
             '                ) AS uuCI\n' +
             '                ON\n' +
             '                    courseinstance.id = uuCI.courseInstanceId\n' +
@@ -171,12 +171,10 @@ class DatabaseAdapter {
             '                uuCIcI.courseId = course.id\n' +
             '        ) AS uuCIcIc\n' +
             '        ON\n' +
-            '            uuCIcIc.id = admissionrequirement.id\n' +
+            '            uuCIcIc.id = admissionrequirement.courseInstanceId\n' +
             '    ) AS uuCIcIcaR\n' +
             'ON\n' +
             '    uuCIcIcaR.id = admissionrequirementitem.admissionRequirementId\n' +
-            'WHERE\n' +
-            '    admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionRequirementType = 0\n' +
             ') AS uuCIcIcaRaRI\n' +
             'JOIN(\n' +
             '    SELECT\n' +
@@ -202,7 +200,7 @@ class DatabaseAdapter {
             'ON\n' +
             '    tempTable4.admissionRequirementItemID = uuCIcIcaRaRI.id\n' +
             'GROUP BY\n' +
-            '    uuCIcIcaRaRI.courseInstanceId',[userProgressTupel.userId]);
+            '    uuCIcIcaRaRI.courseInstanceId',[userProgressTupel.userId, userProgressTupel.userId]);
 
         return promiseQuery;
     }
