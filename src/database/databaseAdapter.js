@@ -279,7 +279,7 @@ class DatabaseAdapter {
     {
         /*let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirement (admissionRequirementType, expireDate, maxTasks, minTasks, minPercentage, mandatory, admissionRequirementId) VALUES (?,?,?,?,?,?,?)', [admissionRequirementItem.admissionRequirementType, admissionRequirementItem.expireDate, admissionRequirementItem.maxTasks, admissionRequirementItem.minTasks, admissionRequirementItem.minPercentage, admissionRequirementItem.mandatory, admissionRequirementItem.admissionRequirementId]);*/
 
-        let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirement ' + this.createInsertPart(admissionRequirementItem));
+        let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirementItem ' + this.createInsertPart(admissionRequirementItem));
 
 
         return promiseQuery.then((result) => {
@@ -307,27 +307,40 @@ class DatabaseAdapter {
      */
     getAdmissionRequirements(params)
     {
-        let promiseQuery = this.poolPromise.query('SELECT ar.id AS id, ar.courseInstanceId, arItem.id AS itemId, arItem.admissionRequirementType, ' +
+        let promiseQuery = this.poolPromise.query('SELECT ar.id AS arId, ar.courseInstanceId, arItem.id AS itemId, arItem.admissionRequirementType, ' +
             'arItem.expireDate, arItem.minTasks, arItem.maxTasks, arItem.minPercentage, arItem.mandatory FROM admissionRequirement ar ' +
-            'INNER JOIN  admissionRequirementItem arItem ON ar.id = arItem.admissionRequirementId' + this.createWherePart(params));
+            'INNER JOIN  admissionRequirementItem arItem ON ar.id = arItem.admissionRequirementId' + this.createWherePart(params) + ' ORDER BY arId');
 
         return promiseQuery.then((list) => {
             let result = [];
             _.forEach(list, (current) => {
-                let temp = {
-                    id: current.id,
-                    courseInstanceId: current.courseInstanceId,
-                    admissionRequirementItem : {
-                        id: current.itemId,
-                        admissionRequirementType: current.admissionRequirementType,
-                        expireDate: current.expireDate,
-                        minTasks: current.minTasks,
-                        maxTasks: current.maxTasks,
-                        minPercentage: current.minPercentage,
-                        mandatory: current.mandatory
-                    }
+                // At first create Item to use it in both cases
+                let admissionRequirementItem = {
+                    id: current.itemId,
+                    admissionRequirementType: current.admissionRequirementType,
+                    expireDate: current.expireDate,
+                    minTasks: current.minTasks,
+                    maxTasks: current.maxTasks,
+                    minPercentage: current.minPercentage,
+                    mandatory: current.mandatory
                 };
-                result.push(temp)
+
+                // Add item to the last admissionRequirement if the id is matching the last id
+                if(result.length > 0 && result[result.length - 1].id === current.arId)
+                {
+                    result[result.length - 1].admissionRequirementItems.push(admissionRequirementItem);
+                }
+                // Create a new admissionRequirement
+                else
+                {
+                    let temp = {
+                        id: current.arId,
+                        courseInstanceId: current.courseInstanceId,
+                        admissionRequirementItems : [admissionRequirementItem]
+                    };
+                    result.push(temp)
+                }
+
             });
             return result;
         });

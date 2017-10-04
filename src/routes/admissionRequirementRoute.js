@@ -22,7 +22,7 @@ routerInstance.get('/:id?', authenticationMiddleware,  (req, res, next) => {
         params.courseInstanceId = req.body.courseInstanceId;
 
     if(req.params.id)
-        params.id = req.params.id;
+        params['ar.id'] = req.params.id;
 
     // Get the semesters matching the given params
     databaseAdapter.getAdmissionRequirements(params).then((semesters) => {
@@ -37,7 +37,7 @@ routerInstance.get('/:id?', authenticationMiddleware,  (req, res, next) => {
 //region - Put -
 
 /**
- * Saves an admissionRequirementItem to the database
+ * Saves an admissionRequirement to the database
  * Put Parameter: courseInstanceId, items: [ {type, date?, maxTasks?, minTasks?, minPercentage?, mandatory?}, ...]
  */
 routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(req, res, next) => {
@@ -48,8 +48,54 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
     };
 
     // Save the new user
-    databaseAdapter.putUserProgress(userProgress).then((userProgress) => {
+    databaseAdapter.putAdmissionRequirement(admissionRequirement).then((admissionRequirement) => {
+        res.status(200).json(admissionRequirement);
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
 
+});
+
+/**
+ * Saves an admissionRequirementItem to the database
+ * Put Parameter: courseInstanceId, admissionRequirementId? [ {admissionRequirementType, date?, maxTasks?, minTasks?, minPercentage?, mandatory?}, ...]
+ */
+routerInstance.put('/item', authenticationMiddleware, ensureParametersMiddleware,(req, res, next) => {
+
+    // Check if an admissionRequirement already exists
+    let params = {
+        courseInstanceId: req.body.courseInstanceId
+    };
+
+    // Handle optional Parameters
+    if(req.body.admissionRequirementId)
+        params.id = req.body.admissionRequirementId;
+
+    databaseAdapter.getAdmissionRequirements(params).then((admissionRequirement) => {
+        // Create admissionRequirement if no one exists
+        if(!admissionRequirement || admissionRequirement.length < 1)
+            return databaseAdapter.putAdmissionRequirement({courseInstanceId: params.courseInstanceId});
+
+        return admissionRequirement[0];
+
+    }).then((admissionRequirement) => {
+        // Create Item to the admissionRequirement
+        let admissionRequirementItem = {
+            admissionRequirementType: req.body.admissionRequirementType,
+            expireDate: req.body.expireDate,
+            maxTasks: req.body.maxTasks,
+            minTasks: req.body.minTasks,
+            minPercentage: req.body.minPercentage,
+            mandatory: req.body.mandatory,
+            admissionRequirementId: admissionRequirement.id
+        };
+
+        return databaseAdapter.putAdmissionRequirementItem(admissionRequirementItem);
+
+    }).then((admissionRequirementItem) => {
+        res.status(200).json(admissionRequirementItem);
+    }).catch((error) => {
+        res.status(500).json(error);
     });
 
 });
