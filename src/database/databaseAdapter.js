@@ -386,8 +386,22 @@ class DatabaseAdapter {
      * Searches for a semester inside of the semester table according to search parameters
      * @param semester
      */
-    getSemester(semester){
-        let promiseQuery = this.poolPromise.query('SELECT * FROM semester '+ this.createWherePart(semester));
+    getSemester(semester, currentDate){
+        let queryString = 'SELECT * FROM semester '+ this.createWherePart(semester);
+
+        // Check if currentDate is passed
+        if(currentDate) {
+
+            // Be sure not to create 2 WHERE String or something like this
+            if(semester.length && semester.length > 0)
+               queryString += ' AND ';
+            else
+                queryString +=' WHERE ';
+
+            queryString += this.poolPromise.escape(currentDate) + ' BETWEEN startDate AND endDate ';
+        }
+
+        let promiseQuery = this.poolPromise.query(queryString);
 
         return promiseQuery.then((param) => {
             return param;

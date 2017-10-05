@@ -51,6 +51,10 @@ function performTests()
     }).then(() => {
         return getAdmissionRequirementItem();
     }).then(() => {
+        return getSemesterById();
+    }).then(() => {
+        return getSemesterByCurrentDate();
+    }).then(() => {
         tests.finish();
     });
 }
@@ -218,7 +222,7 @@ function getCourseInstanceGroup()
 {
     return axiosInstance.get('/courseInstance/' + session.courseInstanceId + '/group/' + session.courseInstanceGroupId, { headers: axiosInstance.headers }).then(function (response) {
 
-        if(!response.data || response.data.length != 1 || response.data[0].id !== session.courseInstanceGroupId)
+        if(!response.data || response.data.length !== 1 || response.data[0].id !== session.courseInstanceGroupId)
             throw 'courseInstanceGroup Invalid';
 
         session.courseInstanceGroup = response.data[0];
@@ -232,7 +236,7 @@ function getCourseInstance()
 {
     return axiosInstance.get('/courseInstance/' + session.courseInstanceId, { headers: axiosInstance.headers }).then(function (response) {
 
-        if(!response.data || response.data.length != 1 || response.data[0].id !== session.courseInstanceId)
+        if(!response.data || response.data.length !== 1 || response.data[0].id !== session.courseInstanceId)
             throw 'courseInstance Invalid';
 
         session.courseInstance = response.data[0];
@@ -246,7 +250,7 @@ function getUserCourseInstance()
 {
     return axiosInstance.get('/userCourseInstance/', { headers: axiosInstance.headers }).then(function (response) {
 
-        if(!response.data || response.data.length != 1 || response.data[0].id !== session.userCourseInstanceId)
+        if(!response.data || response.data.length !== 1 || response.data[0].id !== session.userCourseInstanceId)
             throw 'userCourseInstanceId Invalid';
 
         session.courseInstance = response.data[0];
@@ -260,10 +264,10 @@ function getAdmissionRequirement()
 {
     return axiosInstance.get('/admissionRequirement/' + session.admissionRequirementId, { headers: axiosInstance.headers }).then(function (response) {
 
-        if(!response.data || response.data.length != 1 || response.data[0].id !== session.admissionRequirementId)
+        if(!response.data || response.data.length !== 1 || response.data[0].id !== session.admissionRequirementId)
             throw 'admissionRequirement Invalid';
 
-        if(!response.data[0].admissionRequirementItems || response.data[0].admissionRequirementItems.length != 1 || session.admissionRequirementItemId !== response.data[0].admissionRequirementItems[0].id)
+        if(!response.data[0].admissionRequirementItems || response.data[0].admissionRequirementItems.length !== 1 || session.admissionRequirementItemId !== response.data[0].admissionRequirementItems[0].id)
             throw 'admissionRequirementItem Invalid';
 
         session.courseInstance = response.data[0];
@@ -277,7 +281,7 @@ function getAdmissionRequirementItem()
 {
     return axiosInstance.get('/admissionRequirement/' + session.admissionRequirementId + '/item/' + session.admissionRequirementItemId, { headers: axiosInstance.headers }).then(function (response) {
 
-        if(!response.data || response.data.length != 1 || response.data[0].id !== session.admissionRequirementItemId)
+        if(!response.data || response.data.length !== 1 || response.data[0].id !== session.admissionRequirementItemId)
             throw 'admissionRequirementItem Invalid';
 
         session.courseInstance = response.data[0];
@@ -292,7 +296,7 @@ function getUserProgress()
     return axiosInstance.get('/userProgress?semesterId=' + session.semesterId, { headers: axiosInstance.headers }).then(function (response) {
 
         //session.userProgressId2 = response.data;
-        if(!response.data || response.data.length != 1)
+        if(!response.data || response.data.length !== 1)
             throw 'userProgress Invalid';
 
         session.userProgress = response.data[0];
@@ -302,6 +306,35 @@ function getUserProgress()
     });
 }
 
+function getSemesterById()
+{
+    return axiosInstance.get('/semester/' + session.semesterId, { headers: axiosInstance.headers }).then(function (response) {
+
+        //session.userProgressId2 = response.data;
+        if(!response.data || response.data.length !== 1 || response.data[0].id !== session.semesterId)
+            throw 'semester Invalid';
+
+        session.userProgress = response.data[0];
+        tests.passed('Get semester by id');
+    }).catch(function (error) {
+        tests.failed('Get semester by id', error);
+    });
+}
+
+function getSemesterByCurrentDate()
+{
+    let currentDate = '2017-12-24 00:00:00.0'; //TODO: Fix currentDate
+    return axiosInstance.get('/semester?currentDate=' + currentDate, { headers: axiosInstance.headers }).then(function (response) {
+
+        if(!response.data || response.data.length < 1)
+            throw 'semester Invalid';
+
+        session.userProgress = response.data[0];
+        tests.passed('Get semester by currentDate');
+    }).catch(function (error) {
+        tests.failed('Get semester by currentDate', error);
+    });
+}
 
 
 //endregion

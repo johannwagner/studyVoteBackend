@@ -16,15 +16,14 @@ const databaseAdapter = new DatabaseAdapter(5);
 routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
-    let params = {
-        semesterId: req.headers['currentdate']
-    };
+    let params = {};
 
+    // Handle optional Parameters
     if(req.params.id)
         params.id = req.params.id;
 
     // Get the semesters matching the given params
-    databaseAdapter.getSemester(params).then((semesters) => {
+    databaseAdapter.getSemester(params, req.query['currentDate']).then((semesters) => {
         res.status(200).json(semesters);
     }).catch((error) => {
         res.status(500).json(error);
