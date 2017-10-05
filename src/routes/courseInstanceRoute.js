@@ -179,6 +179,9 @@ routerInstance.post('/:id', (req, res, next) => {
         if(req.body.room)
             newCourseInstance.room = req.body.room;
 
+        if(Object.keys(newCourseInstance).length < 1)
+            throw { message: 'No update Parameter sent', errorCode: Constants.ErrorConstants.INVALID_PARAMETERS};
+
         return databaseAdapter.postCourseInstance(newCourseInstance, { id: req.params.id });
 
     }).then((result) => {
@@ -219,6 +222,9 @@ routerInstance.post('/:id/group/:groupId', authenticationMiddleware, (req, res, 
 
         if(req.body.endTime)
             newCourseInstanceGroup.endTime = req.body.endTime;
+
+        if(Object.keys(newCourseInstanceGroup).length < 1)
+            throw { message: 'No update Parameter sent', errorCode: Constants.ErrorConstants.INVALID_PARAMETERS};
 
         return databaseAdapter.postCourseInstanceGroup(newCourseInstanceGroup, { id: req.params.groupId });
 
