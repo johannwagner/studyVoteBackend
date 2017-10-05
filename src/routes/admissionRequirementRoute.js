@@ -10,20 +10,27 @@ const _ = require('lodash');
 
 //region - Get -
 /**
+ * @namespace /admissionRequirement
+ */
+
+/**
  * Get the admissionRequirements matching the given Parameters
- * Get Parameter: courseInstanceId
- * @return: admissionRequirement Object, contains a List of admissionRequirementItems
+ * @function GET
+ * @param {number} /:id? path
+ * @param {number} courseInstanceId optional
+ * @return admissionRequirement Object, contains a List of admissionRequirementItems
+ * @memberOf /admissionRequirement
  **/
-routerInstance.get('/:id?', authenticationMiddleware,  (req, res, next) => {
+routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let params = {};
 
     // Handle optional Parameters
-    if(req.body.courseInstanceId)
+    if (req.body.courseInstanceId)
         params.courseInstanceId = req.body.courseInstanceId;
 
-    if(req.params.id)
+    if (req.params.id)
         params['ar.id'] = req.params.id;
 
     // Get the semesters matching the given params
@@ -35,32 +42,35 @@ routerInstance.get('/:id?', authenticationMiddleware,  (req, res, next) => {
 });
 
 /**
- * Get the admissionRequirementItemss matching the given Parameters
- * Get Parameter: courseInstanceId
- * @return: admissionRequirement Object, contains a List of admissionRequirementItems
+ * Get the admissionRequirementItems matching the given Parameters
+ * @function GET
+ * @param {number} /:id/item/:itemId? path
+ * @param {number} courseInstanceId optional
+ * @return admissionRequirementItems
+ * @memberOf /admissionRequirement
  **/
-routerInstance.get('/:id/item/:itemId?', authenticationMiddleware,  (req, res, next) => {
+routerInstance.get('/:id/item/:itemId?', authenticationMiddleware, (req, res, next) => {
 
-    // Check which parameters are passed in the request
-    let params = {};
+        // Check which parameters are passed in the request
+        let params = {};
 
-    // Handle optional Parameters
-    if(req.body.courseInstanceId)
-        params.courseInstanceId = req.body.courseInstanceId;
+        // Handle optional Parameters
+        if (req.body.courseInstanceId)
+            params.courseInstanceId = req.body.courseInstanceId;
 
-    if(req.params.id)
-        params['admissionRequirementId'] = req.params.id;
+        if (req.params.id)
+            params['admissionRequirementId'] = req.params.id;
 
-    if(req.params.itemId)
-        params['id'] = req.params.itemId;
+        if (req.params.itemId)
+            params['id'] = req.params.itemId;
 
-    // Get the semesters matching the given params
-    databaseAdapter.getAdmissionRequirementItems(params).then((semesters) => {
-        res.status(200).json(semesters);
-    }).catch((error) => {
-        res.status(500).json(error);
+        // Get the semesters matching the given params
+        databaseAdapter.getAdmissionRequirementItems(params).then((semesters) => {
+            res.status(200).json(semesters);
+        }).catch((error) => {
+            res.status(500).json(error);
+        });
     });
-});
 
 //endregion
 
@@ -68,8 +78,12 @@ routerInstance.get('/:id/item/:itemId?', authenticationMiddleware,  (req, res, n
 
 /**
  * Saves an admissionRequirement to the database
- * Put Parameter: courseInstanceId, items: [ {type, date?, maxTasks?, minTasks?, minPercentage?, mandatory?}, ...]
- */
+ * @function PUT
+ * @param {number} / path
+ * @param {number} courseInstanceId mandatory
+ * @return admissionRequirement
+ * @memberOf /admissionRequirement
+ **/
 routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(req, res, next) => {
 
     // Check if an admissionRequirement already exists
@@ -88,8 +102,18 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
 
 /**
  * Saves an admissionRequirementItem to the database
- * Put Parameter: courseInstanceId, admissionRequirementId? [ {admissionRequirementType, date?, maxTasks?, minTasks?, minPercentage?, mandatory?}, ...]
- */
+ * @function PUT
+ * @param {number} /item path
+ * @param {number} courseInstanceId mandatory
+ * @param {number} type admissionRequirementType
+ * @param {date} expireDate?
+ * @param {number} maxTasks?
+ * @param {number} minTasks?
+ * @param {float} minPercentage?
+ * @param {bool} mandatory?
+ * @return admissionRequirementItem
+ * @memberOf /admissionRequirement
+ **/
 routerInstance.put('/item', authenticationMiddleware, ensureParametersMiddleware,(req, res, next) => {
 
     // Check if an admissionRequirement already exists
@@ -133,10 +157,21 @@ routerInstance.put('/item', authenticationMiddleware, ensureParametersMiddleware
 //endregion
 
 //region - Post -
+
 /**
  * Updates the exisiting admissionRequirementItem
- * Post Parameter: type?, date?, maxTasks?, minTasks?, minPercentage?, mandatory?
- */
+ * @function POST
+ * @param {number} /item/:id path
+ * @param {number} courseInstanceId?
+ * @param {number} type admissionRequirementType
+ * @param {date} expireDate?
+ * @param {number} maxTasks?
+ * @param {number} minTasks?
+ * @param {float} minPercentage?
+ * @param {bool} mandatory?
+ * @return SQL-Result from mysql-js
+ * @memberOf /admissionRequirement
+ **/
 routerInstance.post('/item/:id', authenticationMiddleware, (req, res, next) => {
 
     // Update the existing admissionRequirementItem
@@ -192,6 +227,13 @@ routerInstance.post('/item/:id', authenticationMiddleware, (req, res, next) => {
 
 //region - Delete -
 
+/**
+ *  Deletes the admissionRequirement if no references are set to it
+ * @function DELETE
+ * @param {number} /item/id: path
+ * @return SQL-Result from mysql-js
+ * @memberOf /admissionRequirement
+ **/
 routerInstance.delete('/item/:id', (req, res, next) => {
     // Update the existing admissionRequirementItem
     let params = {
