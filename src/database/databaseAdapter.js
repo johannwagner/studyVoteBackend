@@ -146,32 +146,37 @@ class DatabaseAdapter {
                 'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0\n' + semesterisnotNull +
                 'GROUP BY courseinstance.id', [userProgressTupel.userId]);
 
-        return promiseQuery.then((result) => {
-            return {
-                Result : {
-                    tasksAccomplished : result[0].TasksSolved,
-                    tasksAvailable: result[0].TasksAvailable,
-                    percentageDone : result[0].Percentage
-                },
-                courseInstance : {
-                    id : result[0].courseinstanceId,
-                    displayName : result[0].CourseName,
-                    shortName : result[0].CourseShortName,
-                    room : result[0].room,
-                    docent : result[0].docent
-                },
-                Semester : {
-                    id : result[0].SemesterId,
-                    endDate : result[0].enddate,
-                    name : result[0].SemesterName
-                },
-                Requirements : {
-                    minTasks : result[0].minTasks,
-                    maxTasks : result[0].maxTasks,
-                    type : result[0].admissionRequirementType,
-                    minPercentage : result[0].minPercentage
-                }
-            };
+        return promiseQuery.then((resultlist) => {
+            let pushList = [];
+            resultlist.forEach((result) => {
+                let element = {
+                    progress : {
+                    tasksAccomplished : result.TasksSolved,
+                    tasksAvailable: result.TasksAvailable,
+                    percentageDone : result.Percentage
+                    },
+                    courseInstance : {
+                        id : result.courseinstanceId,
+                        displayName : result.CourseName,
+                        shortName : result.CourseShortName,
+                        room : result.room,
+                        docent : result.docent
+                    },
+                    semester : {
+                        id : result.SemesterId,
+                        endDate : result.enddate,
+                        name : result.SemesterName
+                    },
+                    requirements : {
+                        minTasks : result.minTasks,
+                        maxTasks : result.maxTasks,
+                        type : result.admissionRequirementType,
+                        minPercentage : result.minPercentage
+                    }
+                };
+                pushList.push(element);
+            });
+            return pushList;
         });
 
     }
