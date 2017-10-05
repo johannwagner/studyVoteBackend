@@ -13,7 +13,7 @@ const databaseAdapter = new DatabaseAdapter(5);
  * Get Parameter: semesterId, courseId
  * returns: the courseInstances matching the given parameters
  **/
-routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
+routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let params = {
@@ -22,7 +22,7 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 
     // Handle optional Parameters
     if(req.query['semesterId'])
-        semesterId: req.query['semesterId'];
+        params['semester.id'] = req.query['semesterId'];
 
     if(req.params.id)
         params['courseInstance.id'] = req.params.id;
@@ -30,6 +30,27 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
     // Get the courseInstances matching the given params
     databaseAdapter.getCourseInstances(params).then((courseInstances) => {
         res.status(200).json(courseInstances);
+
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
+});
+
+/**
+ * Get the courseInstances from database
+ * Get Parameter: semesterId, courseId
+ * returns: the courseInstances matching the given parameters
+ **/
+routerInstance.get('/:id', authenticationMiddleware, (req, res, next) => {
+
+    // Check which parameters are passed in the request
+    let params = {
+        'courseInstance.id': req.params.id
+    };
+
+    // Get the courseInstances matching the given params
+    databaseAdapter.getCourseInstanceDetails(params).then((courseInstance) => {
+        res.status(200).json(courseInstance);
 
     }).catch((error) => {
         res.status(500).json(error);
