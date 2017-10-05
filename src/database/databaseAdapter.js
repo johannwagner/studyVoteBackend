@@ -103,144 +103,82 @@ class DatabaseAdapter {
      * Returns weekly progress of a user in a single course, with a bunch of information about it
      * @param  userProgressTupel
      */
-    getCourseUserProgress(userProgressTupel){
-        let promiseQuery = this.poolPromise.query('SELECT * FROM (SELECT admissionrequirementitem.id as admissionRequirementItemId, admissionrequirementitem.admissionRequirementType, admissionrequirementitem.expireDate, admissionrequirementitem.maxTasks, admissionrequirementitem.minTasks, admissionrequirementitem.minPercentage, admissionrequirementitem.mandatory FROM admissionrequirementitem JOIN (SELECT admissionrequirement.id as notshow FROM admissionrequirement WHERE courseInstanceId = ?) as tempTable1 ON admissionrequirementitem.admissionRequirementId = tempTable1.notshow) as tempTable2 JOIN (SELECT admissionrequirementitemweek.id as admissionrequirementitemweekid, maxCount, creationUserId, admissionRequirementItemID FROM admissionrequirementitemweek JOIN (SELECT admissionRequirementItemWeekID, createDate, taskCount FROM userprogress WHERE userid = ?) as tempTable3 ON tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id) as tempTable4 ON tempTable4.admissionRequirementItemID = tempTable2.admissionRequirementItemId', [userProgressTupel.courseInstanceId, userProgressTupel.userId]);
+    getCourseUserProgressDetailed(userProgressTupel){
+        let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId\n' +
+            '\n' +
+            'FROM \n' +
+            '\n' +
+            'usercourseinstance \n' +
+            'JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid \n' +
+            'JOIN course ON course.id = courseinstance.courseid \n' +
+            'JOIN semester ON semester.id = courseinstance.semesterid \n' +
+            'JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid \n' +
+            'JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid \n' +
+            'LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
+            'JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id\n' +
+            'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0 AND courseinstance.id = ?', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
 
         return promiseQuery;
     }
 
     /**
-     * Returns combined progress of a user in a single course, Column 1 & 2 for maximum Task and minimum for admission, Column 3 for solved tasks, column 4 for all till now admissioned tasks
+     * Returns progress of a user for single semester composed of all votes
      * @param userProgressTupel
      */
     getCourseUserProgressComplete(userProgressTupel){
-        let semesterisNull;
+        let semesterisnotNull = '';
         if(userProgressTupel.semesterId){
-           semesterisNull = 'WHERE\n' + 'semester.id =' + this.poolPromise.escape(userProgressTupel.semesterId);
+           semesterisnotNull = 'AND semester.id =' + this.poolPromise.escape(userProgressTupel.semesterId);
         }
 
-        let promiseQuery = this.poolPromise.query('SELECT\n' +
-                '    uuCIcIcaRaRI.courseInstanceId,\n' +
-                '    uuCIcIcaRaRI.displayName,\n' +
-                '    uuCIcIcaRaRI.shortName,\n' +
-                '    uuCIcIcaRaRI.minPercentage,\n' +
-                '    uuCIcIcaRaRI.minTasks,\n' +
-                '    uuCIcIcaRaRI.maxTasks,\n' +
-                '    uuCIcIcaRaRI.endDate,\n' +
-                '    uuCIcIcaRaRI.semesterName,\n' +
-                '    uuCIcIcaRaRI.room,\n' +
-                '    uuCIcIcaRaRI.docent,\n' +
-                '    SUM(taskCount),\n' +
-                '    SUM(maxCount)\n' +
-                'FROM\n' +
-                '    (\n' +
-                '    SELECT\n' +
-                '        admissionrequirementitem.id,\n' +
-                '        uuCIcIcaR.displayName,\n' +
-                '        uuCIcIcaR.shortName,\n' +
-                '        admissionrequirementitem.minTasks,\n' +
-                '        admissionrequirementitem.maxTasks,\n' +
-                '        admissionrequirementitem.minPercentage,\n' +
-                '        uuCIcIcaR.courseInstanceId,\n' +
-                '        uuCIcIcaR.endDate,\n' +
-                '        uuCIcIcaR.semesterName,\n' +
-                '        uuCIcIcaR.room,\n' +
-                '        uuCIcIcaR.docent\n' +
-                '    FROM\n' +
-                '        admissionrequirementitem\n' +
-                '    JOIN(\n' +
-                '        SELECT\n' +
-                '            admissionrequirement.id,\n' +
-                '            admissionrequirement.courseInstanceId,\n' +
-                '            uuCIcIc.displayName,\n' +
-                '            uuCIcIc.shortName,\n' +
-                '            uuCIcIc.endDate,\n' +
-                '            uuCIcIc.semesterName,\n' +
-                '            uuCIcIc.room,\n' +
-                '            uuCIcIc.docent\n' +
-                '        FROM\n' +
-                '            admissionrequirement\n' +
-                '        JOIN(\n' +
-                '            SELECT\n' +
-                '                uuCIcI2.displayName,\n' +
-                '                uuCIcI2.shortName,\n' +
-                '                uuCIcI2.id,\n' +
-                '                semester.endDate,\n' +
-                '                semester.displayName AS semesterName,\n' +
-                '                uuCIcI2.room,\n' +
-                '                uuCIcI2.docent\n' +
-                '            FROM\n' +
-                '                semester\n' +
-                '            JOIN(\n' +
-                '                SELECT\n' +
-                '                    course.displayName,\n' +
-                '                    course.shortName,\n' +
-                '                    uuCIcI.semesterId,\n' +
-                '                    uuCIcI.id,\n' +
-                '                    uuCIcI.room,\n' +
-                '                    uuCIcI.docent\n' +
-                '                FROM\n' +
-                '                    course\n' +
-                '                JOIN(\n' +
-                '                    SELECT\n' +
-                '                        courseinstance.courseId,\n' +
-                '                        courseinstance.id,\n' +
-                '                        courseinstance.semesterId,\n' +
-                '                        courseinstance.room,\n' +
-                '                        courseinstance.docent\n' +
-                '                    FROM\n' +
-                '                        courseinstance\n' +
-                '                    JOIN(\n' +
-                '                        SELECT\n' +
-                '                            usercourseinstance.courseInstanceId\n' +
-                '                        FROM\n' +
-                '                            usercourseinstance\n' +
-                '                        WHERE\n' +
-                '                            userId = ?\n' +
-                '                    ) AS uuCI\n' +
-                '                ON\n' +
-                '                    courseinstance.id = uuCI.courseInstanceId\n' +
-                '                ) AS uuCIcI\n' +
-                '            ON\n' +
-                '                uuCIcI.courseId = course.id\n' +
-                '            ) AS uuCIcI2\n' +
-                '        ON\n' +
-                '            uuCIcI2.semesterId = semester.id\n' + semesterisNull +
-                '        ) AS uuCIcIc\n' +
-                '    ON\n' +
-                '        uuCIcIc.id = admissionrequirement.courseInstanceId\n' +
-                '    ) AS uuCIcIcaR\n' +
-                'ON\n' +
-                '    uuCIcIcaR.id = admissionrequirementitem.admissionRequirementId\n' +
-                'WHERE\n' +
-                '    admissionrequirementitem.admissionRequirementType = 0 AND admissionrequirementitem.mandatory = 1\n' +
-                ') AS uuCIcIcaRaRI\n' +
-                'JOIN(\n' +
-                '    SELECT\n' +
-                '        admissionrequirementitemweek.id AS admissionrequirementitemweekid,\n' +
-                '        maxCount,\n' +
-                '        creationUserId,\n' +
-                '        admissionRequirementItemID,\n' +
-                '        taskCount\n' +
-                '    FROM\n' +
-                '        admissionrequirementitemweek\n' +
-                '    JOIN(\n' +
-                '        SELECT\n' +
-                '            admissionRequirementItemWeekID,\n' +
-                '            taskCount\n' +
-                '        FROM\n' +
-                '            userprogress\n' +
-                '        WHERE\n' +
-                '            userid = ?\n' +
-                '    ) AS tempTable3\n' +
-                'ON\n' +
-                '    tempTable3.admissionRequirementItemWeekID = admissionrequirementitemweek.id\n' +
-                ') AS tempTable4\n' +
-                'ON\n' +
-                '    tempTable4.admissionRequirementItemID = uuCIcIcaRaRI.id\n' +
-                'GROUP BY\n' +
-                '    uuCIcIcaRaRI.courseInstanceId', [userProgressTupel.userId, userProgressTupel.userId]);
-        return promiseQuery;
+            let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.minPercentage, admissionrequirementitem.minTasks, admissionrequirementitem.maxTasks, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, SUM(admissionrequirementitemweek.maxCount) as TasksAvailable, SUM(userProgress.`taskCount`) as TasksSolved, admissionrequirementitem.minPercentage, courseinstance.room, courseinstance.docent, (SUM(userProgress.`taskCount`) / SUM(admissionrequirementitemweek.maxCount)) as Percentage\n' +
+                '\n' +
+                'FROM \n' +
+                '\n' +
+                'usercourseinstance \n' +
+                'JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid \n' +
+                'JOIN course ON course.id = courseinstance.courseid \n' +
+                'JOIN semester ON semester.id = courseinstance.semesterid \n' +
+                'JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid \n' +
+                'JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid \n' +
+                'LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
+                'JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id\n' +
+                'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0\n' + semesterisnotNull +
+                'GROUP BY courseinstance.id', [userProgressTupel.userId]);
+
+        return promiseQuery.then((resultlist) => {
+            let pushList = [];
+            resultlist.forEach((result) => {
+                let element = {
+                    progress : {
+                    tasksAccomplished : result.TasksSolved,
+                    tasksAvailable: result.TasksAvailable,
+                    percentageDone : result.Percentage
+                    },
+                    courseInstance : {
+                        id : result.courseinstanceId,
+                        displayName : result.CourseName,
+                        shortName : result.CourseShortName,
+                        room : result.room,
+                        docent : result.docent
+                    },
+                    semester : {
+                        id : result.SemesterId,
+                        endDate : result.enddate,
+                        name : result.SemesterName
+                    },
+                    requirements : {
+                        minTasks : result.minTasks,
+                        maxTasks : result.maxTasks,
+                        type : result.admissionRequirementType,
+                        minPercentage : result.minPercentage
+                    }
+                };
+                pushList.push(element);
+            });
+            return pushList;
+        });
+
     }
 
     //endregion
