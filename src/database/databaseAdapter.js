@@ -428,9 +428,6 @@ class DatabaseAdapter {
             return result;
         });
     }
-
-
-
     /**
      * Deletes one entry from CourseInstance table
      * @param params

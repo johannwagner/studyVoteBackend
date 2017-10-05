@@ -236,10 +236,10 @@ function getCourseInstance()
 {
     return axiosInstance.get('/courseInstance/' + session.courseInstanceId, { headers: axiosInstance.headers }).then(function (response) {
 
-        if(!response.data || response.data.length !== 1 || response.data[0].id !== session.courseInstanceId)
+        if(!response.data || response.data.id !== session.courseInstanceId)
             throw 'courseInstance Invalid';
 
-        session.courseInstance = response.data[0];
+        session.courseInstance = response.data;
         tests.passed('Get courseInstance');
     }).catch(function (error) {
         tests.failed('Get courseInstance', error);
