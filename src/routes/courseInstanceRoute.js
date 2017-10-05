@@ -179,7 +179,54 @@ routerInstance.post('/:id', (req, res, next) => {
         if(req.body.room)
             newCourseInstance.room = req.body.room;
 
+        if(Object.keys(newCourseInstance).length < 1)
+            throw { message: 'No update Parameter sent', errorCode: Constants.ErrorConstants.INVALID_PARAMETERS};
+
         return databaseAdapter.postCourseInstance(newCourseInstance, { id: req.params.id });
+
+    }).then((result) => {
+        res.status(200).json(result);
+    }).catch((error) => {
+        handleError(req, res, next, error);
+    });
+});
+
+/**
+ * Updates the courseInstanceGroups
+ * Post Parameter:
+ **/
+routerInstance.post('/:id/group/:groupId', authenticationMiddleware, (req, res, next) => {
+    // Update the existing admissionRequirementItem
+    let params = {
+        id: req.params.groupId
+    };
+
+    // Fetch the row from the Database to be sure it exists
+    databaseAdapter.getCourseInstanceGroups(params).then((courseInstanceGroups) => {
+
+        if(!courseInstanceGroups || courseInstanceGroups.length < 1)
+            throw { message: 'CourseInstanceGroup for id ' + params.id + ' not found', errorCode: Constants.ErrorConstants.NO_ENTRY_FOR_ID };
+
+        return courseInstanceGroups[0];
+
+    }).then((courseInstanceGroup) => {
+
+        let newCourseInstanceGroup = {};
+
+        // Update only passed Parameters
+        if(req.body.room)
+            newCourseInstanceGroup.room = req.body.room;
+
+        if(req.body.startTime)
+            newCourseInstanceGroup.startTime = req.body.startTime;
+
+        if(req.body.endTime)
+            newCourseInstanceGroup.endTime = req.body.endTime;
+
+        if(Object.keys(newCourseInstanceGroup).length < 1)
+            throw { message: 'No update Parameter sent', errorCode: Constants.ErrorConstants.INVALID_PARAMETERS};
+
+        return databaseAdapter.postCourseInstanceGroup(newCourseInstanceGroup, { id: req.params.groupId });
 
     }).then((result) => {
         res.status(200).json(result);

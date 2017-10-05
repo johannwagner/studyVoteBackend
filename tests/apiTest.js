@@ -55,6 +55,12 @@ function performTests()
     }).then(() => {
         return getSemesterByCurrentDate();
     }).then(() => {
+        return changeAdmissionRequirementItem();
+    }).then(() => {
+        return changeCourseInstance();
+    }).then(() => {
+        return changeCourseInstanceGroup();
+    }).then(() => {
         tests.finish();
     });
 }
@@ -342,32 +348,59 @@ function getSemesterByCurrentDate()
 function changeAdmissionRequirementItem()
 {
     let data = {
-        id: session.admissionRequirementItemId,
-        taskCount: 4,
-        maxCount: 6,
-        semesterWeek: 1
+        admissionRequirementType: 1,
+        expireDate: '2018-03-30 00:00:00.0',
+        maxTasks: 56,
+        minPercentage: 0.66,
+        mandatory: false
     };
 
-    return axiosInstance.put('/userProgress', data, { headers: axiosInstance.headers }).then(function (response) {
+    return axiosInstance.post('/admissionRequirement/item/' + session.admissionRequirementItemId, data, { headers: axiosInstance.headers }).then(function (response) {
 
-        session.userProgressId = response.data.id;
-        if(!session.userProgressId)
-            throw 'userProgressId Invalid';
+        if(!response.data.changedRows)
+            throw 'No rows updated';
 
-        tests.passed('Create userProgress');
+        tests.passed('Update admissionRequirementItem');
     }).catch(function (error) {
-        tests.failed('Create userProgress', error);
+        tests.failed('Update admissionRequirementItem', error);
     });
 }
 
 function changeCourseInstance()
 {
+    let data = {
+        docent: 'Turowski',
+        room: '207'
+    };
 
+    return axiosInstance.post('/courseInstance/' + session.courseInstanceId, data, { headers: axiosInstance.headers }).then(function (response) {
+
+        if(!response.data.changedRows)
+            throw 'No rows updated';
+
+        tests.passed('Update courseInstance');
+    }).catch(function (error) {
+        tests.failed('Update courseInstance', error);
+    });
 }
 
 function changeCourseInstanceGroup()
 {
+    let data = {
+        room: '334',
+        startTime: '1970-01-01 17:00:00.0',
+        endTime: '1970-01-01 19:00:00.0'
+    };
 
+    return axiosInstance.post('/courseInstance/' + session.courseInstanceId + '/group/' + session.courseInstanceGroupId, data, { headers: axiosInstance.headers }).then(function (response) {
+
+        if(!response.data.changedRows)
+            throw 'No rows updated';
+
+        tests.passed('Update courseInstanceGroup');
+    }).catch(function (error) {
+        tests.failed('Update courseInstanceGroup', error);
+    });
 }
 
 //endregion

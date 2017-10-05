@@ -175,6 +175,9 @@ routerInstance.post('/item/:id', authenticationMiddleware, (req, res, next) => {
         if(!_.isUndefined(req.body.mandatory))
             newAdmissionRequirementItem.mandatory = req.body.mandatory;
 
+        if(Object.keys(newAdmissionRequirementItem).length < 1)
+            throw { message: 'No update Parameter sent', errorCode: Constants.ErrorConstants.INVALID_PARAMETERS};
+
         return databaseAdapter.postAdmissionRequirementItem(newAdmissionRequirementItem, params);
 
     }).then((admissionRequirementItem) => {

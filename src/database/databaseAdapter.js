@@ -327,9 +327,9 @@ class DatabaseAdapter {
         'ciGroup.startTime, ciGroup.endTime ' +
         'FROM courseInstance INNER JOIN semester ON courseInstance.semesterId = semester.id ' +
         'INNER JOIN course ON courseInstance.courseId = course.id ' +
-        'INNER JOIN courseInstanceGroup ciGroup ON courseInstance.id = ciGroup.courseInstanceId ' +
-        'INNER JOIN admissionRequirement ar ON ar.courseInstanceId = courseInstance.id ' +
-        'INNER JOIN admissionRequirementItem arItem ON ar.id = arItem.admissionRequirementId  ' + this.createWherePart(params) + ' ORDER BY arItem.id, ciGroup.id '); //+ );
+        'LEFT JOIN courseInstanceGroup ciGroup ON courseInstance.id = ciGroup.courseInstanceId ' +
+        'LEFT JOIN admissionRequirement ar ON ar.courseInstanceId = courseInstance.id ' +
+        'LEFT JOIN admissionRequirementItem arItem ON ar.id = arItem.admissionRequirementId  ' + this.createWherePart(params) + ' ORDER BY arItem.id, ciGroup.id '); //+ );
 
         return promiseQuery.then((resultList) => {
             let result = {};
@@ -374,20 +374,30 @@ class DatabaseAdapter {
                     result = {
                         id: current.id,
                         course: course,
-                        semester: semester,
-                        admissionRequirement: {
+                        semester: semester
+                    };
+
+                    if(current.arId) {
+                        result.admissionRequirement = {
                             id: current.arId,
                             admissionRequirementItems : [admissionRequirementItem]
-                        },
-                        courseInstanceGroups: [courseInstanceGroup]
+                        }
+                    }
 
-                    };
+                    if(current.ciGroupId) {
+                       result.courseInstanceGroups = [courseInstanceGroup]
+
+                    }else
+                    {
+                        groupsAdded = true;
+                    }
 
                 }
 
+
                 // Add groups only one time within the first arItem
                 if(!groupsAdded) {
-                    if (result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id === current.arItemId) {
+                    if (!result.admissionRequirement || result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id === current.arItemId) {
                         // courseInstanceGroup is already added
                         if(!firstRow)
                             result.courseInstanceGroups.push(courseInstanceGroup);
@@ -399,7 +409,7 @@ class DatabaseAdapter {
                 }
 
                 // Skip all rows with the same arItemId
-                if(result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id !== current.arItemId)
+                if(result.admissionRequirement && result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id !== current.arItemId)
                 {
                     result.admissionRequirement.admissionRequirementItems.push(admissionRequirementItem);
                 }
@@ -471,6 +481,19 @@ class DatabaseAdapter {
             return  courseInstanceGroup;
         });
     }
+
+    /**
+     * Updates the given courseInstanceGroup
+     * @param params
+     */
+     postCourseInstanceGroup(courseInstanceGroup, params){
+        let promiseQuery = this.poolPromise.query('UPDATE courseInstanceGroup ' + this.createUpdatePart(courseInstanceGroup) + this.createWherePart(params));
+
+        return promiseQuery.then((result) => {
+            return result;
+        });
+    }
+
 
     //endregion
 
