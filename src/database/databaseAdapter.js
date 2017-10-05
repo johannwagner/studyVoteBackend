@@ -104,7 +104,9 @@ class DatabaseAdapter {
      * @param  userProgressTupel
      */
     getCourseUserProgressDetailed(userProgressTupel){
-        let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname, course.shortname, semester.displayname, semester.aenddate, semester.id as SemesterId, admissionrequirementitem.minPercentage, admissionrequirementitem.minTasks, admissionrequirementitem.maxTasks, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount, admissionrequirementitemweek.creationUserId, admissionRequirementitemweek.semesterweek, userProgress.`taskCount` FROM \n' +
+        let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId\n' +
+            '\n' +
+            'FROM \n' +
             '\n' +
             'usercourseinstance \n' +
             'JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid \n' +
@@ -114,7 +116,7 @@ class DatabaseAdapter {
             'JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid \n' +
             'LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
             'JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id\n' +
-            'WHERE usercourseinstance.userid = 1', [userProgressTupel.courseInstanceId, userProgressTupel.userId]);
+            'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0 AND courseinstance.id = ?', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
 
         return promiseQuery;
     }
@@ -141,31 +143,32 @@ class DatabaseAdapter {
                 'JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid \n' +
                 'LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
                 'JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id\n' +
-                'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0' + semesterisnotNull, [userProgressTupel.userId]);
+                'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0\n' + semesterisnotNull +
+                'GROUP BY courseinstance.id', [userProgressTupel.userId]);
 
         return promiseQuery.then((result) => {
             return {
                 Result : {
-                    TasksAccomplished : result[0].TasksSolved,
-                    TasksAvailable: result[0].TasksAvailable,
-                    PercentageDone : result[0].Percentage
+                    tasksAccomplished : result[0].TasksSolved,
+                    tasksAvailable: result[0].TasksAvailable,
+                    percentageDone : result[0].Percentage
                 },
                 courseInstance : {
-                    Id : result[0].courseinstanceId,
+                    id : result[0].courseinstanceId,
                     displayName : result[0].CourseName,
                     shortName : result[0].CourseShortName,
-                    Room : result[0].room,
-                    Docent : result[0].docent
+                    room : result[0].room,
+                    docent : result[0].docent
                 },
                 Semester : {
-                    Id : result[0].SemesterId,
-                    EndDate : result[0].enddate,
-                    Name : result[0].SemesterName
+                    id : result[0].SemesterId,
+                    endDate : result[0].enddate,
+                    name : result[0].SemesterName
                 },
                 Requirements : {
                     minTasks : result[0].minTasks,
                     maxTasks : result[0].maxTasks,
-                    Type : result[0].admissionRequirementType,
+                    type : result[0].admissionRequirementType,
                     minPercentage : result[0].minPercentage
                 }
             };
