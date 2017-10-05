@@ -5,6 +5,8 @@ const authenticationMiddleware = require('../middleware/authenticationMiddleware
 const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['courseInstanceId']);
 const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
+const handleError = require('../helper/errorHandling');
+const _ = require('lodash');
 
 //region - Get -
 /**
@@ -130,13 +132,100 @@ routerInstance.put('/item', authenticationMiddleware, ensureParametersMiddleware
 
 //endregion
 
+//region - Post -
+/**
+ * Updates the exisiting admissionRequirementItem
+ * Post Parameter: type?, date?, maxTasks?, minTasks?, minPercentage?, mandatory?
+ */
+routerInstance.post('/item/:id', authenticationMiddleware, (req, res, next) => {
+
+    // Update the existing admissionRequirementItem
+    let params = {
+        id: req.params.id
+    };
+
+    // Fetch the row from the Database to be sure it exists
+    databaseAdapter.getAdmissionRequirementItems(params).then((admissionRequirementItems) => {
+
+        if(!admissionRequirementItems || admissionRequirementItems.length < 1)
+            throw { message: 'AdmissionRequirement for id ' + params.id + ' not found', errorCode: Constants.ErrorConstants.NO_ENTRY_FOR_ID };
+
+        return admissionRequirementItems[0];
+
+    }).then((admissionRequirementItem) => {
+
+        let newAdmissionRequirementItem = {};
+
+        // Update only passed Parameters
+        if(req.body.admissionRequirementType)
+            newAdmissionRequirementItem.admissionRequirementType = req.body.admissionRequirementType;
+
+        if(req.body.expireDate)
+            newAdmissionRequirementItem.expireDate = req.body.expireDate;
+
+        if(!_.isUndefined(req.body.maxTasks))
+            newAdmissionRequirementItem.maxTasks = req.body.maxTasks;
+
+        if(!_.isUndefined(req.body.minTasks))
+            newAdmissionRequirementItem.minTasks = req.body.minTasks;
+
+        if(req.body.minPercentage)
+            newAdmissionRequirementItem.minPercentage = req.body.minPercentage;
+
+        if(!_.isUndefined(req.body.mandatory))
+            newAdmissionRequirementItem.mandatory = req.body.mandatory;
+
+        return databaseAdapter.postAdmissionRequirementItem(newAdmissionRequirementItem, params);
+
+    }).then((admissionRequirementItem) => {
+        res.status(200).json(admissionRequirementItem);
+    }).catch((error) => {
+        handleError(req, res, next, error);
+    });
+
+});
+
+//endregion
+
+//region - Delete -
+
+routerInstance.delete('/item/:id', (req, res, next) => {
+    // Update the existing admissionRequirementItem
+    let params = {
+        id: req.params.id
+    };
+
+    // Fetch the row from the Database to be sure it exists
+    databaseAdapter.getAdmissionRequirementItems(params).then((admissionRequirementItems) => {
+
+        if(!admissionRequirementItems || admissionRequirementItems.length < 1)
+            throw { message: 'AdmissionRequirement for id ' + params.id + ' not found', errorCode: Constants.ErrorConstants.NO_ENTRY_FOR_ID };
+
+        return admissionRequirementItems[0];
+
+    }).then((admissionRequirementItem) => {
+        return databaseAdapter.deleteAdmissionRequirementItem(params);
+
+    }).then((result) => {
+        res.status(200).json(result);
+    }).catch((error) => {
+        handleError(req, res, next, error);
+    });
+});
+
+//endregion
+
 //region - Not used -
 
-routerInstance.delete('/', (req, res, next) => {
+routerInstance.delete('/:id?', (req, res, next) => {
     res.status(403).send('not implemented');
 });
 
-routerInstance.post('/', (req, res, next) => {
+routerInstance.post('/:id?', (req, res, next) => {
+    res.status(403).send('not implemented');
+});
+
+routerInstance.post('/item', (req, res, next) => {
     res.status(403).send('not implemented');
 });
 
