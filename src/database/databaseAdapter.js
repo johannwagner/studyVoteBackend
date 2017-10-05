@@ -103,7 +103,7 @@ class DatabaseAdapter {
      * Returns weekly progress of a user in a single course, with a bunch of information about it
      * @param  userProgressTupel
      */
-    getCourseUserProgressD(userProgressTupel){
+    getCourseUserProgressDetailed(userProgressTupel){
         let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname, course.shortname, semester.displayname, semester.aenddate, semester.id as SemesterId, admissionrequirementitem.minPercentage, admissionrequirementitem.minTasks, admissionrequirementitem.maxTasks, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount, admissionrequirementitemweek.creationUserId, admissionRequirementitemweek.semesterweek, userProgress.`taskCount` FROM \n' +
             '\n' +
             'usercourseinstance \n' +
@@ -141,7 +141,7 @@ class DatabaseAdapter {
                 'JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid \n' +
                 'LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
                 'JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id\n' +
-                'WHERE usercourseinstance.userid = 1 AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0' + semesterisnotNull, [userProgressTupel.userId]);
+                'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0' + semesterisnotNull, [userProgressTupel.userId]);
 
         return promiseQuery.then((result) => {
             return {
