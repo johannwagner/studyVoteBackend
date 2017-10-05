@@ -329,12 +329,34 @@ function getSemesterByCurrentDate()
         if(!response.data || response.data.length < 1)
             throw 'semester Invalid';
 
-        session.userProgress = response.data[0];
         tests.passed('Get semester by currentDate');
     }).catch(function (error) {
         tests.failed('Get semester by currentDate', error);
     });
 }
+
+//endregion
+
+//region - Change -
+
+function changeAdmissionRequirementItem()
+{
+
+}
+
+function changeCourseInstance()
+{
+
+}
+
+function changeCourseInstanceGroup()
+{
+
+}
+
+//endregion
+
+//region - Delete -
 
 
 //endregion

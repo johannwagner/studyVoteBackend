@@ -458,6 +458,94 @@ class DatabaseAdapter {
     }
 
     /**
+     * Gets the courseInstances matching the passed params
+     * @param params semesterId
+     */
+    getCourseInstanceDetails(params)
+    {
+        let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, ' +
+        'course.id as courseId, semester.id as semesterId, semester.displayName as semesterName, semester.startDate, semester.endDate, ar.id AS arId, arItem.id AS arItemId, arItem.admissionRequirementType,' +
+        'arItem.expireDate, arItem.maxTasks, arItem.minTasks, arItem.minPercentage, arItem.mandatory, ciGroup.id AS ciGroupId, ciGroup.courseInstanceId, ciGroup.room AS groupRoom, ' +
+        'ciGroup.startTime, ciGroup.endTime ' +
+        'FROM courseInstance INNER JOIN semester ON courseInstance.semesterId = semester.id ' +
+        'INNER JOIN course ON courseInstance.courseId = course.id ' +
+        'INNER JOIN courseInstanceGroup ciGroup ON courseInstance.id = ciGroup.courseInstanceId ' +
+        'INNER JOIN admissionRequirement ar ON ar.courseInstanceId = courseInstance.id ' +
+        'INNER JOIN admissionRequirementItem arItem ON ar.id = arItem.admissionRequirementId  ' + this.createWherePart(params) + ' ORDER BY arItem.id, ciGroup.id '); //+ );
+
+        return promiseQuery.then((resultList) => {
+            let result = {};
+            let groupsAdded = false;
+            _.forEach(resultList, (current) => {
+                // At first create Item to use it in both cases
+                let admissionRequirementItem = {
+                    id: current.arItemId,
+                    admissionRequirementType: current.admissionRequirementType,
+                    expireDate: current.expireDate,
+                    minTasks: current.minTasks,
+                    maxTasks: current.maxTasks,
+                    minPercentage: current.minPercentage,
+                    mandatory: current.mandatory
+                };
+
+                let courseInstanceGroup = {
+                    id: current.ciGroupId,
+                    room: current.groupRoom,
+                    startTime: current.startTime,
+                    endTime: current.endTime
+                };
+
+                if(!result.id)
+                {
+                    let course = {
+                        id: current.courseId,
+                        displayName: current.displayName,
+                        shortName: current.shortName
+                    };
+
+                    let semester = {
+                        id: current.semesterId,
+                        displayName: current.semesterName,
+                        startDate: current.startDate,
+                        endDate: current.endDate
+                    };
+
+                    result = {
+                        id: current.id,
+                        course: course,
+                        semester: semester,
+                        admissionRequirement: {
+                            id: current.arId,
+                            admissionRequirementItems : [admissionRequirementItem]
+                        },
+                        courseInstanceGroups: [courseInstanceGroup]
+
+                    };
+
+                }
+
+                if(!groupsAdded) {
+                    if (result.courseInstanceGroups.length > 1 && result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id === current.arItemId) {
+                        result.courseInstanceGroups.push(courseInstanceGroup);
+                    }
+                    else {
+                        groupsAdded = true;
+                    }
+                }
+
+                // Add item to the last admissionRequirement if the id is matching the last id
+                if(result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id !== current.arItemId)
+                {
+                    result.admissionRequirement.admissionRequirementItems.push(admissionRequirementItem);
+                }
+            });
+            return result;
+        });
+    }
+
+
+
+    /**
      * Deletes one entry from CourseInstance table
      * @param params
      */
