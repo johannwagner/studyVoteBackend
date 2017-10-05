@@ -11,7 +11,9 @@ module.exports = {
         USER_ALREADY_REGISTERED: 6,
         INVALID_PARAMETERS: 7,
         DUPLICATE_ENTRY: 8,
-        DATABASE_ERROR: 9
+        DATABASE_ERROR: 9,
+        UNKNOWN_ERROR: 10,
+        NO_ENTRY_FOR_ID: 11
     },
     /**
      * Secret for JWT Tokens.

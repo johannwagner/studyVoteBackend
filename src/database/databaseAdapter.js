@@ -245,6 +245,22 @@ class DatabaseAdapter {
     }
 
     /**
+     * Updates the courseInstance to the database and returns the result
+     * @param courseInstance
+     */
+    postCourseInstance(courseInstance, params)
+    {
+        /*let promiseQuery = this.poolPromise.query('INSERT INTO courseInstance (semesterId, courseId) VALUES ' +
+            '(?,?)',[courseInstance.semesterId, courseInstance.courseId]);*/
+
+        let promiseQuery = this.poolPromise.query('UPDATE courseInstance ' + this.createUpdatePart(courseInstance) + this.createWherePart(params));
+
+        return promiseQuery.then((result) => {
+            return result;
+        });
+    }
+
+    /**
      * Gets the courseInstances matching the passed params
      * @param params semesterId
      */
@@ -273,7 +289,7 @@ class DatabaseAdapter {
     }
 
     /**
-     * Gets the courseInstances matching the passed params
+     * Gets the courseInstance with Details matching the passed params
      * @param params semesterId
      */
     getCourseInstanceDetails(params)
@@ -467,6 +483,33 @@ class DatabaseAdapter {
     }
 
     /**
+     * Updates the admissionRequirementItem to the database and returns the rows Updated
+     * @param admissionRequirementItem entity
+     * @param params WHERE params (obviously id...)
+     */
+    postAdmissionRequirementItem(admissionRequirementItem, params)
+    {
+        let promiseQuery = this.poolPromise.query('UPDATE admissionrequirementItem ' + this.createUpdatePart(admissionRequirementItem) + ' ' + this.createWherePart(params));
+
+        return promiseQuery.then((result) => {
+            return result;
+        });
+    }
+
+    /**
+     * Delete the admissionRequirementItem to the database and returns the rows Updated
+     * @param params WHERE params (obviously id...)
+     */
+    deleteAdmissionRequirementItem(params)
+    {
+        let promiseQuery = this.poolPromise.query('DELETE FROM admissionrequirementItem ' + this.createWherePart(params));
+
+        return promiseQuery.then((result) => {
+            result;
+        });
+    }
+
+    /**
      * Saves the admissionRequirementItemWeek to the database and returns the admissionRequirementItem with filled id
      * @param admissionRequirementItem
      */
@@ -611,8 +654,6 @@ class DatabaseAdapter {
      * Creates a SQL WHERE String including the passed parameters
      * @param params Object of columnNames and values
      */
-
-
     createWherePart(params)
     {
         if(Object.keys(params).length <= 0) {
@@ -624,6 +665,23 @@ class DatabaseAdapter {
         });
 
         return ' WHERE ' + whereParts.join(' AND ')
+    }
+
+    /**
+     *
+     * @param object
+     */
+    createUpdatePart(params)
+    {
+        if(Object.keys(params).length <= 0) {
+            return '';
+        }
+
+        let whereParts = _.map(params, (value, key) => {
+            return this.poolPromise.escapeId(key) + '=' + this.poolPromise.escape(value);
+        });
+
+        return ' SET ' + whereParts.join(', ')
     }
 
     /**

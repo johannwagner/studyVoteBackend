@@ -5,6 +5,7 @@ const authenticationMiddleware = require('../middleware/authenticationMiddleware
 const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['semesterId']);
 const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
+const handleError = require('../helper/errorHandling');
 
 //region - Get -
 
@@ -146,6 +147,44 @@ routerInstance.put('/:id/group/', authenticationMiddleware, (req, res, next) => 
         res.status(200).json(courseInstanceGroup);
     }).catch((error) => {
         res.status(500).json(error);
+    });
+});
+
+//endregion
+
+//region - Post -
+
+routerInstance.post('/:id', (req, res, next) => {
+    // Update the existing admissionRequirementItem
+    let params = {
+        'courseInstance.id': req.params.id
+    };
+
+    // Fetch the row from the Database to be sure it exists
+    databaseAdapter.getCourseInstances(params).then((courseInstances) => {
+
+        if(!courseInstances || courseInstances.length < 1)
+            throw { message: 'CourseInstance for id ' + params.id + ' not found', errorCode: Constants.ErrorConstants.NO_ENTRY_FOR_ID };
+
+        return courseInstances[0];
+
+    }).then((courseInstance) => {
+
+        let newCourseInstance = {};
+
+        // Update only passed Parameters
+        if(req.body.docent)
+            newCourseInstance.docent = req.body.docent;
+
+        if(req.body.room)
+            newCourseInstance.room = req.body.room;
+
+        return databaseAdapter.postCourseInstance(newCourseInstance, { id: req.params.id });
+
+    }).then((result) => {
+        res.status(200).json(result);
+    }).catch((error) => {
+        handleError(req, res, next, error);
     });
 });
 

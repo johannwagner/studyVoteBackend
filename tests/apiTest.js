@@ -341,7 +341,23 @@ function getSemesterByCurrentDate()
 
 function changeAdmissionRequirementItem()
 {
+    let data = {
+        id: session.admissionRequirementItemId,
+        taskCount: 4,
+        maxCount: 6,
+        semesterWeek: 1
+    };
 
+    return axiosInstance.put('/userProgress', data, { headers: axiosInstance.headers }).then(function (response) {
+
+        session.userProgressId = response.data.id;
+        if(!session.userProgressId)
+            throw 'userProgressId Invalid';
+
+        tests.passed('Create userProgress');
+    }).catch(function (error) {
+        tests.failed('Create userProgress', error);
+    });
 }
 
 function changeCourseInstance()
