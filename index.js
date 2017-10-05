@@ -7,6 +7,7 @@ const courseInstanceRouter = require('./src/routes/courseInstanceRoute');
 const userCourseInstanceRouter = require('./src/routes/userCourseInstanceRoute');
 const semesterRouter = require('./src/routes/semesterRoute');
 const admissionRequirementRouter = require('./src/routes/admissionRequirementRoute');
+const userProgressDetailedRouter = require('./src/routes/userProgressDetailedRoute')
 
 const debugRouter = require('./src/routes/debugRoute');
 const expressInstance = express();
@@ -35,6 +36,7 @@ expressInstance.use('/userCourseInstance', userCourseInstanceRouter);
 expressInstance.use('/semester', semesterRouter);
 expressInstance.use('/admissionRequirement', admissionRequirementRouter);
 expressInstance.use('/debug', debugRouter);
+expressInstance.use('/userProgressDetailed', userProgressDetailedRouter);
 
 // TODO: Add Parameter for Port
 const server = expressInstance.listen(1337);

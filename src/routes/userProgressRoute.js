@@ -33,46 +33,7 @@ routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
  * Put Parameter: admissionRequirementItemId, taskCount?, maxTaskCount?, semesterWeek
  */
 routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(req, res, next) => {
-
-    // Mandatory Parameters
-    let arItemWeekParams = {
-        semesterWeek: req.body.semesterWeek,
-        admissionRequirementItemId: req.body.admissionRequirementItemId,
-    }
-
-    // Check if an admissionRequirementItemWeek exists for the current semesterWeek
-    databaseAdapter.getAdmissionRequirementItemWeeks(arItemWeekParams).then((arItemWeeks) => {
-        // Create arItemWeek with maxCount
-        if(!arItemWeeks || arItemWeeks.length < 1)
-        {
-            //TODO: Maxcount mandatory???
-            let arItemWeek = {
-                ...arItemWeekParams,
-                maxCount: req.body.maxCount,
-                creationUserId: req.tokenContext.userId
-            }
-
-            return databaseAdapter.putAdmissionRequirementItemWeek(arItemWeek);
-        }
-
-        return arItemWeeks[0];
-
-    }).then((arItemWeek) => {
-        // Save the userProgress to the admissionRequirementItemWeek
-        let userProgress = {
-            userId: req.tokenContext.userId,
-            admissionRequirementItemWeekId: arItemWeek.id,
-            taskCount: req.body.taskCount
-        };
-
-        return databaseAdapter.putUserProgess(userProgress)
-    }).then((userProgress) => {
-        res.status(200).json(userProgress);
-    }).catch((error) => {
-        res.status(500).json(error);
-    });
-
-
+//Empty for now because of slight repurpose of userProgressRoute
 });
 
 //endregion

@@ -104,21 +104,48 @@ class DatabaseAdapter {
      * @param  userProgressTupel
      */
     getCourseUserProgressDetailed(userProgressTupel){
-        let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId\n' +
-            '\n' +
-            'FROM \n' +
-            '\n' +
-            'usercourseinstance \n' +
-            'JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid \n' +
-            'JOIN course ON course.id = courseinstance.courseid \n' +
-            'JOIN semester ON semester.id = courseinstance.semesterid \n' +
-            'JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid \n' +
-            'JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid \n' +
-            'LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
-            'JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id\n' +
-            'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0 AND courseinstance.id = ?', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
+        let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId \n' +
+            '             \n' +
+            '            FROM  \n' +
+            '             \n' +
+            '            usercourseinstance  \n' +
+            '            JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid  \n' +
+            '            JOIN course ON course.id = courseinstance.courseid  \n' +
+            '            JOIN semester ON semester.id = courseinstance.semesterid  \n' +
+            '            LEFT JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid  \n' +
+            '            LEFT JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid  \n' +
+            '            LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
+            '            JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id \n' +
+            '            WHERE usercourseinstance.userid = ? AND courseinstance.id = ?', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
 
-        return promiseQuery;
+        return promiseQuery.then((resultList) => {
+            let pushList = [];
+            resultList.forEach((element) => {
+                let resultElem = {
+                    result : {
+                        percentage : element.Percentage,
+                        tasksSolved : element.TasksSolved,
+                        tasksAvailable: element.TasksAvailable
+                    },
+                    requirementWeek: {
+                        id: element.weekId,
+                        semesterWeek: element.semesterWeek
+                    },
+                    courseInstance: {
+                        id: element.courseinstanceId,
+                        courseName: element.CourseName,
+                        courseShortName: element.CourseShortName
+                    },
+                    semester : {
+                        id: element.SemesterId,
+                        name: element.SemesterName,
+                        endDate: element.enddate
+                    }
+                };
+                pushList.push(resultElem);
+            });
+            return pushList;
+        });
     }
 
     /**
@@ -131,7 +158,7 @@ class DatabaseAdapter {
            semesterisnotNull = 'AND semester.id =' + this.poolPromise.escape(userProgressTupel.semesterId);
         }
 
-            let promiseQuery = this.poolPromise.query('        SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.minPercentage, admissionrequirementitem.minTasks, admissionrequirementitem.maxTasks, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, SUM(admissionrequirementitemweek.maxCount) as TasksAvailable, SUM(userProgress.`taskCount`) as TasksSolved, admissionrequirementitem.minPercentage, courseinstance.room, courseinstance.docent, (SUM(userProgress.`taskCount`) / SUM(admissionrequirementitemweek.maxCount)) as Percentage \n' +
+            let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.minPercentage, admissionrequirementitem.minTasks, admissionrequirementitem.maxTasks, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, SUM(admissionrequirementitemweek.maxCount) as TasksAvailable, SUM(userProgress.`taskCount`) as TasksSolved, admissionrequirementitem.minPercentage, courseinstance.room, courseinstance.docent, (SUM(userProgress.`taskCount`) / SUM(admissionrequirementitemweek.maxCount)) as Percentage \n' +
                 '                 \n' +
                 '                FROM  \n' +
                 '                 \n' +
