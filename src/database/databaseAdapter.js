@@ -353,8 +353,10 @@ class DatabaseAdapter {
         return promiseQuery.then((resultList) => {
             let result = {};
             let groupsAdded = false;
+            let firstRow = true;
             _.forEach(resultList, (current) => {
-                // At first create Item to use it in both cases
+
+                // At first create Items to use in every row
                 let admissionRequirementItem = {
                     id: current.arItemId,
                     admissionRequirementType: current.admissionRequirementType,
@@ -372,7 +374,8 @@ class DatabaseAdapter {
                     endTime: current.endTime
                 };
 
-                if(!result.id)
+                // Course, Semester and courseInstance added only once
+                if(firstRow)
                 {
                     let course = {
                         id: current.courseId,
@@ -401,20 +404,26 @@ class DatabaseAdapter {
 
                 }
 
+                // Add groups only one time within the first arItem
                 if(!groupsAdded) {
-                    if (result.courseInstanceGroups.length > 1 && result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id === current.arItemId) {
-                        result.courseInstanceGroups.push(courseInstanceGroup);
+                    if (result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id === current.arItemId) {
+                        // courseInstanceGroup is already added
+                        if(!firstRow)
+                            result.courseInstanceGroups.push(courseInstanceGroup);
                     }
+                    // All groups added, dont need to readd them
                     else {
                         groupsAdded = true;
                     }
                 }
 
-                // Add item to the last admissionRequirement if the id is matching the last id
+                // Skip all rows with the same arItemId
                 if(result.admissionRequirement.admissionRequirementItems[result.admissionRequirement.admissionRequirementItems.length - 1].id !== current.arItemId)
                 {
                     result.admissionRequirement.admissionRequirementItems.push(admissionRequirementItem);
                 }
+
+                firstRow = false;
             });
             return result;
         });
