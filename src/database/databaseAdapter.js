@@ -131,20 +131,20 @@ class DatabaseAdapter {
            semesterisnotNull = 'AND semester.id =' + this.poolPromise.escape(userProgressTupel.semesterId);
         }
 
-            let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.minPercentage, admissionrequirementitem.minTasks, admissionrequirementitem.maxTasks, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, SUM(admissionrequirementitemweek.maxCount) as TasksAvailable, SUM(userProgress.`taskCount`) as TasksSolved, admissionrequirementitem.minPercentage, courseinstance.room, courseinstance.docent, (SUM(userProgress.`taskCount`) / SUM(admissionrequirementitemweek.maxCount)) as Percentage\n' +
-                '\n' +
-                'FROM \n' +
-                '\n' +
-                'usercourseinstance \n' +
-                'JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid \n' +
-                'JOIN course ON course.id = courseinstance.courseid \n' +
-                'JOIN semester ON semester.id = courseinstance.semesterid \n' +
-                'JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid \n' +
-                'JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid \n' +
-                'LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
-                'JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id\n' +
-                'WHERE usercourseinstance.userid = ? AND admissionrequirementitem.mandatory = 1 AND admissionrequirementitem.admissionrequirementtype = 0\n' + semesterisnotNull +
-                'GROUP BY courseinstance.id', [userProgressTupel.userId]);
+            let promiseQuery = this.poolPromise.query('        SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.minPercentage, admissionrequirementitem.minTasks, admissionrequirementitem.maxTasks, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, SUM(admissionrequirementitemweek.maxCount) as TasksAvailable, SUM(userProgress.`taskCount`) as TasksSolved, admissionrequirementitem.minPercentage, courseinstance.room, courseinstance.docent, (SUM(userProgress.`taskCount`) / SUM(admissionrequirementitemweek.maxCount)) as Percentage \n' +
+                '                 \n' +
+                '                FROM  \n' +
+                '                 \n' +
+                '                usercourseinstance  \n' +
+                '                JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid  \n' +
+                '                JOIN course ON course.id = courseinstance.courseid  \n' +
+                '                JOIN semester ON semester.id = courseinstance.semesterid  \n' +
+                '                LEFT JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid  \n' +
+                '                LEFT JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid  \n' +
+                '                LEFT JOIN (admissionrequirementitemweek  \n' +
+                '                JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id) ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
+                '                WHERE usercourseinstance.userid = ?\n' + semesterisnotNull +
+                '                GROUP BY courseinstance.id', [userProgressTupel.userId]);
 
         return promiseQuery.then((resultlist) => {
             let pushList = [];
