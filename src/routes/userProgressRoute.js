@@ -24,6 +24,19 @@ routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
 
 });
 
+routerInstance.get('/:courseInstanceId', authenticationMiddleware,  (req, res, next) => {
+    let UserProgressTupel = {
+        userId: req.tokenContext.userId,
+        courseInstanceId: req.params.courseInstanceId
+    }
+
+    databaseAdapter.getCourseUserProgressDetailed(UserProgressTupel).then((stats) =>{
+        res.status(200).json(stats);
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
+
+});
 //endregion
 
 //region - Put -
@@ -72,6 +85,10 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
         res.status(500).json(error);
     });
 
+
+});
+
+routerInstance.put('/', authenticationMiddleware,ensureParametersMiddleware,(req, res, next) => {
 
 });
 
