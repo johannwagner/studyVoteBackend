@@ -7,12 +7,22 @@ const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
 const handleError = require('../helper/errorHandling');
 
+/**
+ * Defines API functions to get/create/update courseInstance(Group)s
+ * defaultRoute: /courseInstance
+ * @namespace /courseInstance
+ */
+
 //region - Get -
 
+
 /**
- * Get the courseInstances from database
- * Get Parameter: semesterId, courseId
- * returns: the courseInstances matching the given parameters
+ * Get the courseInstances from database with filled Semester and Course
+ * @function GET
+ * @param {string} / path
+ * @param {number} semesterId?
+ * @return List of courseInstance Objects
+ * @memberOf /courseInstance
  **/
 routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
 
@@ -25,9 +35,6 @@ routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
     if(req.query['semesterId'])
         params['semester.id'] = req.query['semesterId'];
 
-    if(req.params.id)
-        params['courseInstance.id'] = req.params.id;
-
     // Get the courseInstances matching the given params
     databaseAdapter.getCourseInstances(params).then((courseInstances) => {
         res.status(200).json(courseInstances);
@@ -38,9 +45,11 @@ routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
 });
 
 /**
- * Get the courseInstances from database
- * Get Parameter: semesterId, courseId
- * returns: the courseInstances matching the given parameters
+ * Get the courseInstances from database with filled Semester, Course and admissionRequirementItems and courseInstanceGroups
+ * @function GET
+ * @param {string} /:id path
+ * @return List of courseInstance Objects
+ * @memberOf /courseInstance
  **/
 routerInstance.get('/:id', authenticationMiddleware, (req, res, next) => {
 
@@ -60,8 +69,10 @@ routerInstance.get('/:id', authenticationMiddleware, (req, res, next) => {
 
 /**
  * Get the courseInstanceGroups from database
- * Get Parameter:
- * returns: the courseInstanceGroups matching the given id
+ * @function GET
+ * @param {string} /:id/group/:groupId? path
+ * @return List of courseInstance Objects
+ * @memberOf /courseInstance
  **/
 routerInstance.get('/:id/group/:groupId?', authenticationMiddleware, (req, res, next) => {
 
@@ -88,13 +99,25 @@ routerInstance.get('/:id/group/:groupId?', authenticationMiddleware, (req, res, 
 
 /**
  * Save a courseInstance, if the courseId is not filled, create course automatically
- * Put Parameter: semesterId, courseId?, shortName?, displayName?; displayName and ShortName are mandatory if no courseId is passed
+ * displayName and ShortName are mandatory if no courseId is passed
+ * @function PUT
+ * @param {string} / path
+ * @param {number} semesterId add the course to a semester
+ * @param {number] courseId?
+ * @param {string} shortName?
+ * @param {string} displayName?
+ * @param {string} room?
+ * @param {string} docent?
+ * @return courseInstance Object filled with the id
+ * @memberOf /courseInstance
  **/
 routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
 
     // Check which parameters are passed in the request
     let courseInstance = {
-        semesterId: req.body.semesterId
+        semesterId: req.body.semesterId,
+        room: req.body.room,
+        docent: req.body.docent
     };
 
     // courseId
@@ -129,8 +152,14 @@ routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
 });
 
 /**
- * Saves the courseInstanceGroup to database
- * Put Parameter: room?, startTime?, endTime?
+ * Save a courseInstanceGroup to the database
+ * @function PUT
+ * @param {string} /:id/group/ path
+ * @param {string} room?
+ * @param {date} startTime?
+ * @param {date} endTime?
+ * @return courseInstanceGroup Object filled with the id
+ * @memberOf /courseInstance
  **/
 routerInstance.put('/:id/group/', authenticationMiddleware, (req, res, next) => {
 
@@ -154,6 +183,15 @@ routerInstance.put('/:id/group/', authenticationMiddleware, (req, res, next) => 
 
 //region - Post -
 
+/**
+ * Updates a courseInstance
+ * @function POST
+ * @param {string} /:id path
+ * @param {string} room?
+ * @param {string} docent?
+ * @return SQL-Result from mysql-js
+ * @memberOf /courseInstance
+ **/
 routerInstance.post('/:id', (req, res, next) => {
     // Update the existing admissionRequirementItem
     let params = {
@@ -192,8 +230,19 @@ routerInstance.post('/:id', (req, res, next) => {
 });
 
 /**
- * Updates the courseInstanceGroups
+ *
  * Post Parameter:
+ **/
+
+/**
+ * Updates the courseInstanceGroup
+ * @function POST
+ * @param {string} /:id/group/:groupId path
+ * @param {string} room?
+ * @param {date} startTime?
+ * @param {date} endTime?
+ * @return SQL-Result from mysql-js
+ * @memberOf /courseInstance
  **/
 routerInstance.post('/:id/group/:groupId', authenticationMiddleware, (req, res, next) => {
     // Update the existing admissionRequirementItem
@@ -241,6 +290,7 @@ routerInstance.post('/:id/group/:groupId', authenticationMiddleware, (req, res, 
 
 /**
  * Saves the given courseInstance to the database and sends back the id in case of success
+ * @ignore
  * @param req request
  * @param res response
  * @param next next

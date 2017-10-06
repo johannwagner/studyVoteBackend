@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node tests/apiTest.js",
-    "jsDoc": "jsdoc src/routes/admissionRequirementRoute.js"
+    "jsDoc": "jsdoc src/routes/ readme.md"
   },
   "author": "",
   "license": "ISC",

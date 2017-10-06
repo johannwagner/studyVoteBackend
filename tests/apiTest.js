@@ -121,7 +121,9 @@ function createCourseInstance() {
     let data = {
         semesterId : session.semesterId,
         shortName: 'BV',
-        displayName: 'Bildverarbeitung'
+        displayName: 'Bildverarbeitung',
+        docent: 'Prof xy',
+        room: '334'
     };
 
     return axiosInstance.put('/courseInstance', data, { headers: axiosInstance.headers }).then(function (response) {

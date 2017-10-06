@@ -10,13 +10,15 @@ const _ = require('lodash');
 
 //region - Get -
 /**
+ * Defines API functions to get/create/update admissionRequirement(Item)s
+ * defaultRoute: /admissionRequirement
  * @namespace /admissionRequirement
  */
 
 /**
  * Get the admissionRequirements matching the given Parameters
  * @function GET
- * @param {number} /:id? path
+ * @param {string} /:id? path
  * @param {number} courseInstanceId optional
  * @return admissionRequirement Object, contains a List of admissionRequirementItems
  * @memberOf /admissionRequirement
@@ -44,7 +46,7 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 /**
  * Get the admissionRequirementItems matching the given Parameters
  * @function GET
- * @param {number} /:id/item/:itemId? path
+ * @param {string} /:id/item/:itemId? path
  * @param {number} courseInstanceId optional
  * @return admissionRequirementItems
  * @memberOf /admissionRequirement
@@ -79,7 +81,7 @@ routerInstance.get('/:id/item/:itemId?', authenticationMiddleware, (req, res, ne
 /**
  * Saves an admissionRequirement to the database
  * @function PUT
- * @param {number} / path
+ * @param {string} / path
  * @param {number} courseInstanceId mandatory
  * @return admissionRequirement
  * @memberOf /admissionRequirement
@@ -103,7 +105,7 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
 /**
  * Saves an admissionRequirementItem to the database
  * @function PUT
- * @param {number} /item path
+ * @param {string} /item path
  * @param {number} courseInstanceId mandatory
  * @param {number} type admissionRequirementType
  * @param {date} expireDate?
@@ -161,7 +163,7 @@ routerInstance.put('/item', authenticationMiddleware, ensureParametersMiddleware
 /**
  * Updates the exisiting admissionRequirementItem
  * @function POST
- * @param {number} /item/:id path
+ * @param {string} /item/:id path
  * @param {number} courseInstanceId?
  * @param {number} type admissionRequirementType
  * @param {date} expireDate?
@@ -230,7 +232,7 @@ routerInstance.post('/item/:id', authenticationMiddleware, (req, res, next) => {
 /**
  *  Deletes the admissionRequirement if no references are set to it
  * @function DELETE
- * @param {number} /item/id: path
+ * @param {string} /item/id: path
  * @return SQL-Result from mysql-js
  * @memberOf /admissionRequirement
  **/
