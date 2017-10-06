@@ -5,11 +5,22 @@ const authenticationMiddleware = require('../middleware/authenticationMiddleware
 const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['admissionRequirementItemId', 'semesterWeek']);
 const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
-
+const aaaa = require('jsdoc')
 //region - Get -
 /**
- * Returns complete overview of all Courses
+ * Defines API functions to get/create/update/delete userProgressItems
+ * defaultRoute: /userProgress
+ * @namespace /userProgress
  */
+
+/**
+ * Get userProgress statistics according to the current userId for all occupied courses
+ * @function GET
+ * @param {string} /:id? id of the user
+ * @param {number} semesterId id of the current or selected semester
+ * @return List of all occupied courses with the total number of mandatory vote tasks as well as solved ones
+ * @memberOf /userProgress
+ **/
 routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
     let UserProgressTupel = {
         userId: req.tokenContext.userId,
@@ -24,6 +35,14 @@ routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
 
 });
 
+/**
+ * Get userProgress statistics according to the current userId for a single course
+ * @function GET
+ * @param {string} /:id? id of the user
+ * @param {number} courseInstanceId id of the select courseInstance
+ * @return List of all userProgressItems for a single course with some additional information
+ * @memberOf /userProgress
+ **/
 routerInstance.get('/:courseInstanceId', authenticationMiddleware,  (req, res, next) => {
     let UserProgressTupel = {
         userId: req.tokenContext.userId,
@@ -42,9 +61,13 @@ routerInstance.get('/:courseInstanceId', authenticationMiddleware,  (req, res, n
 //region - Put -
 
 /**
- * Saves a userProgress to the database
- * Put Parameter: admissionRequirementItemId, taskCount?, maxTaskCount?, semesterWeek
- */
+ * Inserts UserProgressItem for a single admissionRequirementItemWeek
+ * @function PUT
+ * @param {string} /:id? id of the user
+ * @param {number} requirementItemId id of the selected RequirementItem
+ * @return returns inserted item for control purposes
+ * @memberOf /userProgress
+ **/
 routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(req, res, next) => {
 
     // Mandatory Parameters
@@ -92,6 +115,13 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
 
 //region - Not used till now!-
 
+/**
+ * Deletes a single userProgress entry
+ * @function DELETE
+ * @param {string} /:id? id of the entry
+ * @return stats of deletion
+ * @memberOf /userProgress
+ **/
 routerInstance.delete('/:id', (req, res, next) => {
     return databaseAdapter.deleteUserProgress(req.params.id).then((userProgress) => {
         res.status(200).json(userProgress);
@@ -100,6 +130,14 @@ routerInstance.delete('/:id', (req, res, next) => {
     });
 });
 
+/**
+ * Edit a single entry of the userProgress table, only taskCount changeable
+ * @function PUT
+ * @param {string} /:id? id of the user
+ * @param {number} taskCount amount of solved tasks
+ * @return stats of update
+ * @memberOf /userProgress
+ **/
 routerInstance.post('/:id', (req, res, next) => {
     let valuePackage = {
         id : req.params.id
