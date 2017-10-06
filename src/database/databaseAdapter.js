@@ -505,7 +505,6 @@ class DatabaseAdapter {
      */
     putAdmissionRequirement(admissionRequirement)
     {
-        /*let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirement (courseInstanceId) VALUES (?)', [admissionRequirement.courseInstanceId]);*/
 
         let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirement ' + this.createInsertPart(admissionRequirement));
 
@@ -521,8 +520,6 @@ class DatabaseAdapter {
      */
     putAdmissionRequirementItem(admissionRequirementItem)
     {
-        /*let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirement (admissionRequirementType, expireDate, maxTasks, minTasks, minPercentage, mandatory, admissionRequirementId) VALUES (?,?,?,?,?,?,?)', [admissionRequirementItem.admissionRequirementType, admissionRequirementItem.expireDate, admissionRequirementItem.maxTasks, admissionRequirementItem.minTasks, admissionRequirementItem.minPercentage, admissionRequirementItem.mandatory, admissionRequirementItem.admissionRequirementId]);*/
-
         let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirementItem ' + this.createInsertPart(admissionRequirementItem));
 
 
@@ -671,6 +668,24 @@ class DatabaseAdapter {
     {
         let promiseQuery = this.poolPromise.query('SELECT * FROM userprogress ' + this.createWherePart(params));
 
+        return promiseQuery;
+    }
+
+    /**
+     * Deletes single Userprogress Item from table
+     * @param id of entry
+     */
+    deleteUserProgress(param){
+        let promiseQuery = this.poolPromise.query('DELETE FROM userprogress WHERE id = ?', [param]);
+        return promiseQuery;
+    }
+
+    /**
+     * Updating UserProgress with defined parameters
+     * @param paramPackage
+     */
+    updateUserProgress(paramPackage){
+        let promiseQuery = this.poolPromise.query('UPDATE userprogress SET taskCount = ? WHERE id = ?', [paramPackage.taskCount, paramPackage.id]);
         return promiseQuery;
     }
 

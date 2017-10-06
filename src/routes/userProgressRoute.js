@@ -8,7 +8,7 @@ const databaseAdapter = new DatabaseAdapter(5);
 
 //region - Get -
 /**
- *
+ * Returns complete overview of all Courses
  */
 routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
     let UserProgressTupel = {
@@ -88,20 +88,31 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
 
 });
 
-routerInstance.put('/', authenticationMiddleware,ensureParametersMiddleware,(req, res, next) => {
-
-});
-
 //endregion
 
-//region - Not used -
+//region - Not used till now!-
 
-routerInstance.delete('/', (req, res, next) => {
-    res.status(403).send('not implemented');
+routerInstance.delete('/:id', (req, res, next) => {
+    return databaseAdapter.deleteUserProgress(req.params.id).then((userProgress) => {
+        res.status(200).json(userProgress);
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
 });
 
-routerInstance.post('/', (req, res, next) => {
-    res.status(403).send('not implemented');
+routerInstance.post('/:id', (req, res, next) => {
+    let valuePackage = {
+        id : req.params.id
+    };
+    if(req.body.taskCount) {
+        valuePackage.taskCount = req.body.taskCount;
+    }
+
+    return databaseAdapter.updateUserProgress(valuePackage).then((userProgress) => {
+        res.status(200).json(userProgress);
+    }).catch((error) => {
+        res.status(500).json(error);
+    });
 });
 
 //endregion
