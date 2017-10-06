@@ -108,11 +108,11 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
  * @param {string} /item path
  * @param {number} courseInstanceId mandatory
  * @param {number} type admissionRequirementType
- * @param {date} expireDate?
- * @param {number} maxTasks?
- * @param {number} minTasks?
- * @param {float} minPercentage?
- * @param {bool} mandatory?
+ * @param {date} expireDate? the date this admissionRequirementItem expires
+ * @param {number} maxTasks? maxTasks for this admissionRequirementItem
+ * @param {number} minTasks? minTasks for this admissionRequirementItem to achieve
+ * @param {float} minPercentage? minPercentage for this admissionRequirementItem to achieve
+ * @param {bool} mandatory? use this admissionRequirementItem to calculate the userprogress
  * @return admissionRequirementItem
  * @memberOf /admissionRequirement
  **/
@@ -164,13 +164,13 @@ routerInstance.put('/item', authenticationMiddleware, ensureParametersMiddleware
  * Updates the exisiting admissionRequirementItem
  * @function POST
  * @param {string} /item/:id path
- * @param {number} courseInstanceId?
+ * @param {number} courseInstanceId? optional
  * @param {number} type admissionRequirementType
- * @param {date} expireDate?
- * @param {number} maxTasks?
- * @param {number} minTasks?
- * @param {float} minPercentage?
- * @param {bool} mandatory?
+ * @param {date} expireDate? the date this admissionRequirementItem expires
+ * @param {number} maxTasks? maxTasks for this admissionRequirementItem
+ * @param {number} minTasks? minTasks for this admissionRequirementItem to achieve
+ * @param {float} minPercentage? minPercentage for this admissionRequirementItem to achieve
+ * @param {bool} mandatory? use this admissionRequirementItem to calculate the userprogress
  * @return SQL-Result from mysql-js
  * @memberOf /admissionRequirement
  **/

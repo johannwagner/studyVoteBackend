@@ -20,7 +20,7 @@ const handleError = require('../helper/errorHandling');
  * Get the courseInstances from database with filled Semester and Course
  * @function GET
  * @param {string} / path
- * @param {number} semesterId?
+ * @param {number} semesterId? optional
  * @return List of courseInstance Objects
  * @memberOf /courseInstance
  **/
@@ -103,11 +103,11 @@ routerInstance.get('/:id/group/:groupId?', authenticationMiddleware, (req, res, 
  * @function PUT
  * @param {string} / path
  * @param {number} semesterId add the course to a semester
- * @param {number] courseId?
- * @param {string} shortName?
- * @param {string} displayName?
- * @param {string} room?
- * @param {string} docent?
+ * @param {number] courseId? optional
+ * @param {string} shortName? shortName of the course
+ * @param {string} displayName? displayName of the course
+ * @param {string} room? room of the courseInstance
+ * @param {string} docent? docent of the courseInstance
  * @return courseInstance Object filled with the id
  * @memberOf /courseInstance
  **/
@@ -155,9 +155,9 @@ routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
  * Save a courseInstanceGroup to the database
  * @function PUT
  * @param {string} /:id/group/ path
- * @param {string} room?
- * @param {date} startTime?
- * @param {date} endTime?
+ * @param {string} room? room of the courseInstanceGroup
+ * @param {date} startTime? startTime of the courseInstanceGroup
+ * @param {date} endTime? endTime of the courseInstanceGroup
  * @return courseInstanceGroup Object filled with the id
  * @memberOf /courseInstance
  **/
@@ -187,8 +187,8 @@ routerInstance.put('/:id/group/', authenticationMiddleware, (req, res, next) => 
  * Updates a courseInstance
  * @function POST
  * @param {string} /:id path
- * @param {string} room?
- * @param {string} docent?
+ * @param {string} room? room of the courseInstance
+ * @param {string} docent? docent of the courseInstance
  * @return SQL-Result from mysql-js
  * @memberOf /courseInstance
  **/
@@ -238,9 +238,9 @@ routerInstance.post('/:id', (req, res, next) => {
  * Updates the courseInstanceGroup
  * @function POST
  * @param {string} /:id/group/:groupId path
- * @param {string} room?
- * @param {date} startTime?
- * @param {date} endTime?
+ * @param {string} room? room of the courseInstanceGroup
+ * @param {date} startTime? startTime of the courseInstanceGroup
+ * @param {date} endTime? endTime of the courseInstanceGroup
  * @return SQL-Result from mysql-js
  * @memberOf /courseInstance
  **/
