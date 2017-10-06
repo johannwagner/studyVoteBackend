@@ -8,6 +8,21 @@ const createSignedToken = require('../helper/tokenhelper').createSignedToken;
 
 //region - Post -
 
+/**
+ * Defines API functions to login a user into the backend
+ * defaultRoute: /tokenRoute
+ * @namespace /tokenRoute
+ */
+
+/**
+ * Performs a login operation and sends back the Json Web Token
+ * @function POST
+ * @param {string} / path
+ * @param {string} userMail email of the user
+ * @param {string} userPasswordHash passwordHash of the user
+ * @return Json Web Token
+ * @memberOf /tokenRoute
+ **/
 routerInstance.post('/', (req, res, next) => {
     let userMail = req.body.userMail;
     let userPasswordHash = req.body.userPasswordHash;

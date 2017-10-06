@@ -9,9 +9,18 @@ const databaseAdapter = new DatabaseAdapter(5);
 //region - Get -
 
 /**
- * Get the userCourseInstances from database for the current User
- * Get Parameter: courseId
- * returns: the semester matching the currentDate or if undefined all semesters
+ * Defines API functions to get/create/update userCourseInstances
+ * defaultRoute: /userCourseInstance
+ * @namespace /userCourseInstance
+ */
+
+/**
+ * Get the userCourseInstance from database
+ * @function GET
+ * @param {string} / path
+ * @param {number} courseId? optional
+ * @return List of userCourseInstance Objects
+ * @memberOf /userCourseInstance
  **/
 routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
 
@@ -37,8 +46,12 @@ routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
 //region - Put -
 
 /**
- * Save a userCourseInstance for the current User
- * Put Parameter: courseInstanceId
+ * Save a userCourseInstance to the database
+ * @function PUT
+ * @param {string} / path
+ * @param {number} courseInstanceId mandatory
+ * @return userCourseInstance Object with filled id
+ * @memberOf /userCourseInstance
  **/
 routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware, (req, res, next) => {
 
@@ -61,8 +74,11 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware, (r
 //region - Delete -
 
 /**
- * Save a userCourseInstance for the current User
- * Delete Parameter: id
+ * Deletes a userCourseInstance from the database
+ * @function DELETE
+ * @param {string} /:id path
+ * @return SQL-Result from mysql-js
+ * @memberOf /userCourseInstance
  **/
 routerInstance.delete('/:id',authenticationMiddleware, (req, res, next) => {
     // Check which parameters are passed in the request

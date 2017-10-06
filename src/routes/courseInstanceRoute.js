@@ -7,14 +7,15 @@ const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
 const handleError = require('../helper/errorHandling');
 
+
+
+//region - Get -
+
 /**
  * Defines API functions to get/create/update courseInstance(Group)s
  * defaultRoute: /courseInstance
  * @namespace /courseInstance
  */
-
-//region - Get -
-
 
 /**
  * Get the courseInstances from database with filled Semester and Course

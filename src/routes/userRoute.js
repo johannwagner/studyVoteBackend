@@ -10,6 +10,19 @@ const createSignedToken = require('../helper/tokenhelper').createSignedToken;
 
 //region - Get -
 
+/**
+ * Defines API functions to get/create a user
+ * defaultRoute: /user
+ * @namespace /user
+ */
+
+/**
+ * Gets the user matching the passed json web token without passwordHash
+ * @function GET
+ * @param {string} / path
+ * @return user without passwordHash
+ * @memberOf /user
+ **/
 routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
     databaseAdapter.getUser({userId: req.tokenContext.userId}).then((user) => {
         user.passwordHash = null;
@@ -24,9 +37,19 @@ routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
 //region - Put -
 
 /**
- * Saves a user to the database, checks if a user already exists to the email and sends the jwt token back
+ * Saves a user to the database,
  * Put Parameter: email, displayName, passwordHash
- */
+
+ /**
+ * Saves a user to the database, checks if a user already exists to the email and sends the Json Web Token back
+ * @function PUT
+ * @param {string} / path
+ * @param {string} userMail email of the user
+ * @param {string} userPasswordHash passwordHash of the user
+ * @param {string} displayName displayName of the user
+ * @return Json Web Token
+ * @memberOf /user
+ **/
 routerInstance.put('/', ensureParametersMiddleware ,(req, res, next) => {
 
     // Check if User with the given email address already exists
