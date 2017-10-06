@@ -9,9 +9,18 @@ const databaseAdapter = new DatabaseAdapter(5);
 //region - Get -
 
 /**
- * Get the semesters from database
- * Get Parameter: currentDate?
- * returns: the semester matching the currentDate or if undefined all semesters
+ * Defines API functions to get/create/update semesters
+ * defaultRoute: /semester
+ * @namespace /semester
+ */
+
+/**
+ * Get the semesters matching the given Parameters
+ * @function GET
+ * @param {string} /:id? path
+ * @param {date} currentDate? if passed, a semester where currentDate is between startDate and endDate is returned
+ * @return List of semester Objects
+ * @memberOf /semester
  **/
 routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 
@@ -35,8 +44,14 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 //region - Put -
 
 /**
- * Save a semester
- * Put Parameter: displayName, startDate, endDate
+ * Save a semester to the database
+ * @function PUT
+ * @param {string} / path
+ * @param {string} displayName? Displayname of the semester
+ * @param {date} startDate? startDate
+ * @param {date} endDate? endDate
+ * @return semester with filled id
+ * @memberOf /semester
  **/
 routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware, (req, res, next) => {
 
