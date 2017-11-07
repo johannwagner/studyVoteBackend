@@ -92,6 +92,8 @@ function loginUser() {
         axiosInstance.headers = {};
         axiosInstance.headers['x-token'] = session.token;
 
+        console.log(response.data);
+
         tests.passed('Login user');
     }).catch(function (error) {
         tests.failed('Login user', error);

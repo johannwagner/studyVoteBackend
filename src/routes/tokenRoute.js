@@ -42,8 +42,21 @@ routerInstance.post('/', (req, res, next) => {
 
         let jwtToken = createSignedToken({userId: user.id});
 
-        res.status(200).json({
-            token: jwtToken
+        databaseAdapter.getSemester({}, new Date().toISOString().slice(0, 19).replace('T', ' ')).then((semester) => {
+            if(!semester || semester.length < 1)
+            {
+                res.status(200).json({
+                    token: jwtToken
+                });
+            }
+            else
+            {
+                res.status(200).json({
+                    token: jwtToken,
+                    semester: semester[0]
+                });
+            }
+
         });
 
     }).catch((error) => {

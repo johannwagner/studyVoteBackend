@@ -240,7 +240,7 @@ class DatabaseAdapter {
             else
                 queryString +=' WHERE ';
 
-            queryString += this.poolPromise.escape(currentDate) + ' BETWEEN startDate AND endDate ';
+            queryString += this.poolPromise.escape(currentDate) + ' BETWEEN startDate AND endDate LIMIT 1';
         }
 
         let promiseQuery = this.poolPromise.query(queryString);
