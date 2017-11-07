@@ -104,7 +104,7 @@ class DatabaseAdapter {
      * @param  userProgressTupel
      */
     getCourseUserProgressDetailed(userProgressTupel){
-        let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId, admissionrequirementitemweek.semesterWeek \n' +
+        let promiseQuery = this.poolPromise.query('SELECT admissionrequirementitem.id AS arId, admissionrequirementitem.admissionrequirementtype AS arType, courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId, admissionrequirementitemweek.semesterWeek \n' +
             '             \n' +
             '            FROM  \n' +
             '             \n' +
@@ -116,11 +116,21 @@ class DatabaseAdapter {
             '            LEFT JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid  \n' +
             '            LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
             '            JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id \n' +
-            '            WHERE usercourseinstance.userid = ? AND courseinstance.id = ?', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
+            '            WHERE usercourseinstance.userid = ? AND courseinstance.id = ? ORDER BY admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.semesterWeek', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
 
         return promiseQuery.then((resultList) => {
             let pushList = [];
             resultList.forEach((element) => {
+
+                let admissionRequirementItem = {
+                    id: element.arId,
+                    type: element.arType,
+                    progress: []
+                };
+
+                if(pushList.length < 1 || pushList[pushList.length - 1].id !== admissionRequirementItem.id)
+                    pushList.push(admissionRequirementItem);
+
                 let resultElem = {
                     result : {
                         percentage : element.Percentage,
@@ -130,7 +140,8 @@ class DatabaseAdapter {
                     requirementWeek: {
                         id: element.weekId,
                         semesterWeek: element.semesterWeek
-                    }/*,
+                    }
+                    /*,
                     courseInstance: {
                         id: element.courseinstanceId,
                         courseName: element.CourseName,
@@ -142,7 +153,8 @@ class DatabaseAdapter {
                         endDate: element.enddate
                     }*/
                 };
-                pushList.push(resultElem);
+                //pushList.push(resultElem);
+                pushList[pushList.length - 1].progress.push(resultElem);
             });
             return pushList;
         });
@@ -240,7 +252,7 @@ class DatabaseAdapter {
             else
                 queryString +=' WHERE ';
 
-            queryString += this.poolPromise.escape(currentDate) + ' BETWEEN startDate AND endDate LIMIT 1';
+            queryString += this.poolPromise.escape(currentDate) + ' BETWEEN startDate AND endDate ORDER BY id LIMIT 1';
         }
 
         let promiseQuery = this.poolPromise.query(queryString);

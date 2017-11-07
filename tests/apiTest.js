@@ -11,7 +11,8 @@ const session = {
         displayName: 'Fred',
         email: Math.random() + '@feuerstein12.com',
         passwordHash: 'FredFeuerstein'
-    }
+    },
+    admissionRequirementItemIds: []
 }
 
 const axiosInstance = axios.create({
@@ -35,9 +36,23 @@ function performTests()
     }).then(() => {
         return createUserCourseInstance();
     }).then(() => {
-        return createAdmissionRequirementItem();
+        return createAdmissionRequirementItem(0);
     }).then(() => {
-        return createUserProgress();
+        return createAdmissionRequirementItem(1);
+    }).then(() => {
+        return createUserProgress(0,3,5,0);
+    }).then(() => {
+        return createUserProgress(1,2,4,1);
+    }).then(() => {
+        return createUserProgress(2,5,7,1);
+    }).then(() => {
+        return createUserProgress(2,5,7,0);
+    }).then(() => {
+        return createUserProgress(3,5,7,1);
+    }).then(() => {
+        return createUserProgress(3,5,7,0);
+    }).then(() => {
+        return createUserProgress(4,2,7,0);
     }).then(() => {
         return getUserProgress();
     }).then(() => {
@@ -178,10 +193,10 @@ function createUserCourseInstance() {
     });
 }
 
-function createAdmissionRequirementItem() {
+function createAdmissionRequirementItem(type) {
     let data = {
         courseInstanceId: session.courseInstanceId,
-        admissionRequirementType: 0,
+        admissionRequirementType: type,
         expireDate: '2018-03-30 00:00:00.0',
         maxTasks: 56,
         minPercentage: 0.66,
@@ -195,6 +210,7 @@ function createAdmissionRequirementItem() {
             throw 'admissionRequirementItemId Invalid';
 
         session.admissionRequirementId = response.data.admissionRequirementId;
+        session.admissionRequirementItemIds.push(response.data.id);
         if(!session.admissionRequirementId)
             throw 'admissionRequirementId Invalid';
 
@@ -204,12 +220,12 @@ function createAdmissionRequirementItem() {
     });
 }
 
-function createUserProgress() {
+function createUserProgress(week, taskcount, maxcount, arItemId) {
     let data = {
-        admissionRequirementItemId: session.admissionRequirementItemId,
-        taskCount: 4,
-        maxCount: 6,
-        semesterWeek: 1
+        admissionRequirementItemId: session.admissionRequirementItemIds[arItemId],
+        taskCount: taskcount,
+        maxCount: maxcount,
+        semesterWeek: week
     };
 
     return axiosInstance.put('/userProgress', data, { headers: axiosInstance.headers }).then(function (response) {
