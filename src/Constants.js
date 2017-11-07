@@ -13,7 +13,8 @@ module.exports = {
         DUPLICATE_ENTRY: 8,
         DATABASE_ERROR: 9,
         UNKNOWN_ERROR: 10,
-        NO_ENTRY_FOR_ID: 11
+        NO_ENTRY_FOR_ID: 11,
+        SEMESTER_NOT_FOUND: 12
     },
     /**
      * Secret for JWT Tokens.

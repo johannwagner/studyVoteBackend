@@ -39,6 +39,44 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
     });
 });
 
+/**
+ * Get the current Week of the semester
+ * @function GET
+ * @param {string} /:id path
+ * @return current Week of the semester
+ * @memberOf /semester
+ **/
+routerInstance.get('/:id/currentWeek', authenticationMiddleware, (req, res, next) => {
+
+    // Check which parameters are passed in the request
+    let params = {};
+
+    // Handle optional Parameters
+    if(req.params.id)
+        params.id = req.params.id;
+
+    let currentDate = new Date();
+
+    databaseAdapter.getSemester(params).then((semester) => {
+        if(!semester || semester.length < 1)
+        {
+            throw { message: 'Semester for id ' + params.id + ' not found',
+                code: Constants.ErrorConstants.SEMESTER_NOT_FOUND };
+        }
+        else
+        {
+            // Returns the diff in weeks
+            var weeks = Math.round((currentDate-semester[0].startDate)/ 604800000);
+
+            res.status(200).json({
+                semesterWeek: weeks
+            });
+        }
+    }).catch((error) => {
+        res.status(500).json(error);
+    });;
+});
+
 //endregion
 
 //region - Put -
