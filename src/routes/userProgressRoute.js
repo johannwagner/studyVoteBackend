@@ -38,7 +38,7 @@ routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
 /**
  * Get userProgress statistics according to the current userId for a single course
  * @function GET
- * @param {string} /:id? id of the user
+ * @param {string} /:id? path
  * @param {number} courseInstanceId id of the select courseInstance
  * @return List of all userProgressItems for a single course with some additional information
  * @memberOf /userProgress
@@ -63,8 +63,11 @@ routerInstance.get('/:courseInstanceId', authenticationMiddleware,  (req, res, n
 /**
  * Inserts UserProgressItem for a single admissionRequirementItemWeek
  * @function PUT
- * @param {string} /:id? id of the user
- * @param {number} requirementItemId id of the selected RequirementItem
+ * @param {string} / path
+ * @param {number} admissionRequirementItemId id of the selected RequirementItem
+ * @param {number} taskCount Count of tasks the user want to vote
+ * @param {number} maxCount Max count of tasks for this week
+ * @param {semesterWeek} semesterWeek Current SemesterWeek
  * @return returns inserted item for control purposes
  * @memberOf /userProgress
  **/
@@ -94,14 +97,35 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
         return arItemWeeks[0];
 
     }).then((arItemWeek) => {
+
+        let filterParams = {
+            userId: req.tokenContext.userId,
+            admissionRequirementItemWeekId: arItemWeek.id
+        };
+        arItemWeekParams.weekId =  arItemWeek.id;
+
+        return databaseAdapter.getUserProgesses(filterParams);
+
+    }).then((userProgresses) => {
+
         // Save the userProgress to the admissionRequirementItemWeek
         let userProgress = {
             userId: req.tokenContext.userId,
-            admissionRequirementItemWeekId: arItemWeek.id,
+            admissionRequirementItemWeekId: arItemWeekParams.weekId,
             taskCount: req.body.taskCount
         };
 
-        return databaseAdapter.putUserProgess(userProgress)
+        if(!userProgresses || userProgresses.length < 1) {
+            return databaseAdapter.putUserProgess(userProgress);
+        }
+        else
+        {
+            let newUserProgress = {
+                id: userProgresses[0].id,
+                taskCount: userProgress.taskCount
+            };
+            return databaseAdapter.updateUserProgress(newUserProgress, true);
+        }
     }).then((userProgress) => {
         res.status(200).json(userProgress);
     }).catch((error) => {

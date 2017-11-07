@@ -707,7 +707,7 @@ class DatabaseAdapter {
      * Updating UserProgress with defined parameters
      * @param paramPackage
      */
-    updateUserProgress(paramPackage){
+    updateUserProgress(paramPackage, returnObject){
         let promiseQuery = this.poolPromise.query('UPDATE userprogress SET taskCount = ? WHERE id = ?', [paramPackage.taskCount, paramPackage.id]);
         return promiseQuery;
     }
