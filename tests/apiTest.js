@@ -261,7 +261,7 @@ function getUserCourseInstance()
         if(!response.data || response.data.length !== 1 || response.data[0].id !== session.userCourseInstanceId)
             throw 'userCourseInstanceId Invalid';
 
-        session.courseInstance = response.data[0];
+        session.userCourseInstance = response.data[0];
         tests.passed('Get userCourseInstance');
     }).catch(function (error) {
         tests.failed('Get userCourseInstance', error);

@@ -5,7 +5,7 @@ const authenticationMiddleware = require('../middleware/authenticationMiddleware
 const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['admissionRequirementItemId', 'semesterWeek']);
 const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
-const aaaa = require('jsdoc')
+//const aaaa = require('jsdoc')
 //region - Get -
 /**
  * Defines API functions to get/create/update/delete userProgressItems
