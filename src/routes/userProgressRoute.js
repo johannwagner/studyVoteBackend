@@ -47,7 +47,7 @@ routerInstance.get('/:courseInstanceId', authenticationMiddleware,  (req, res, n
     let UserProgressTupel = {
         userId: req.tokenContext.userId,
         courseInstanceId: req.params.courseInstanceId
-    }
+    };
 
     databaseAdapter.getCourseUserProgressDetailed(UserProgressTupel).then((stats) =>{
         res.status(200).json(stats);

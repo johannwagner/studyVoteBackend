@@ -104,7 +104,7 @@ class DatabaseAdapter {
      * @param  userProgressTupel
      */
     getCourseUserProgressDetailed(userProgressTupel){
-        let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId \n' +
+        let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId, admissionrequirementitemweek.semesterWeek \n' +
             '             \n' +
             '            FROM  \n' +
             '             \n' +
@@ -130,7 +130,7 @@ class DatabaseAdapter {
                     requirementWeek: {
                         id: element.weekId,
                         semesterWeek: element.semesterWeek
-                    },
+                    }/*,
                     courseInstance: {
                         id: element.courseinstanceId,
                         courseName: element.CourseName,
@@ -140,7 +140,7 @@ class DatabaseAdapter {
                         id: element.SemesterId,
                         name: element.SemesterName,
                         endDate: element.enddate
-                    }
+                    }*/
                 };
                 pushList.push(resultElem);
             });
