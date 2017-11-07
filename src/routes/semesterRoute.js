@@ -42,7 +42,7 @@ routerInstance.get('/:id?', authenticationMiddleware, (req, res, next) => {
 /**
  * Get the current Week of the semester
  * @function GET
- * @param {string} /:id path
+ * @param {string} /:id/currentWeek path
  * @return current Week of the semester
  * @memberOf /semester
  **/

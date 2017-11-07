@@ -115,7 +115,7 @@ class DatabaseAdapter {
             '            LEFT JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid  \n' +
             '            LEFT JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid  \n' +
             '            LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
-            '            JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id \n' +
+            '            LEFT JOIN userProgress ON admissionrequirementitemweek.id = userProgress.admissionrequirementitemweekid AND userProgress.userId = usercourseInstance.userId \n' +
             '            WHERE usercourseinstance.userid = ? AND courseinstance.id = ? ORDER BY admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.semesterWeek', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
 
         return promiseQuery.then((resultList) => {
@@ -124,23 +124,29 @@ class DatabaseAdapter {
 
                 let admissionRequirementItem = {
                     id: element.arId,
-                    type: element.arType,
-                    progress: []
+                    type: element.arType
                 };
 
                 if(pushList.length < 1 || pushList[pushList.length - 1].id !== admissionRequirementItem.id)
                     pushList.push(admissionRequirementItem);
 
-                let resultElem = {
-                    result : {
+                let resultElem = {};
+                let elementFound = false;
+                if(element.TasksAvailable) {
+                    elementFound = true;
+                    resultElem.result = {
                         percentage : element.Percentage,
-                        tasksSolved : element.TasksSolved,
-                        tasksAvailable: element.TasksAvailable
-                    },
-                    requirementWeek: {
+                            tasksSolved : element.TasksSolved,
+                            tasksAvailable: element.TasksAvailable
+                    };
+                }
+                if(element.weekId) {
+                    elementFound = true;
+                    resultElem.requirementWeek ={
                         id: element.weekId,
-                        semesterWeek: element.semesterWeek
+                            semesterWeek: element.semesterWeek
                     }
+                }
                     /*,
                     courseInstance: {
                         id: element.courseinstanceId,
@@ -152,9 +158,14 @@ class DatabaseAdapter {
                         name: element.SemesterName,
                         endDate: element.enddate
                     }*/
-                };
+
                 //pushList.push(resultElem);
-                pushList[pushList.length - 1].progress.push(resultElem);
+                if(elementFound) {
+                    if(!pushList[pushList.length - 1].progress)
+                        pushList[pushList.length - 1].progress = [];
+
+                    pushList[pushList.length - 1].progress.push(resultElem);
+                }
             });
             return pushList;
         });
