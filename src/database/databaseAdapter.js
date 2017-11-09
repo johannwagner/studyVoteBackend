@@ -183,7 +183,7 @@ class DatabaseAdapter {
 
             let promiseQuery = this.poolPromise.query('SELECT courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.minPercentage, admissionrequirementitem.minTasks, admissionrequirementitem.maxTasks, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, SUM(admissionrequirementitemweek.maxCount) as TasksAvailable, SUM(userProgress.`taskCount`) as TasksSolved, admissionrequirementitem.minPercentage, courseinstance.room, courseinstance.docent, (SUM(userProgress.`taskCount`) / SUM(admissionrequirementitemweek.maxCount)) as Percentage \n' +
                 '                 \n' +
-                '                FROM  \n' +
+                '                FROM \n' +
                 '                 \n' +
                 '                usercourseinstance  \n' +
                 '                JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid  \n' +
@@ -192,8 +192,8 @@ class DatabaseAdapter {
                 '                LEFT JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid  \n' +
                 '                LEFT JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid  \n' +
                 '                LEFT JOIN (admissionrequirementitemweek  \n' +
-                '                LEFT JOIN (SELECT * FROM userProgress WHERE userProgress.userid = ?) ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id) ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
-                '                WHERE usercourseinstance.userid = ?\n' + semesterisnotNull +
+                '                LEFT JOIN ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id) ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
+                '                WHERE usercourseinstance.userid = ? AND userProgress.userid = ? \n' + semesterisnotNull +
                 '                GROUP BY courseinstance.id', [userProgressTupel.userId, userProgressTupel.userId]);
 
         return promiseQuery.then((resultlist) => {
