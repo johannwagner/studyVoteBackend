@@ -21,7 +21,7 @@ const handleError = require('../helper/errorHandling');
  * Get the courseInstances from database with filled Semester and Course
  * @function GET
  * @param {string} / path
- * @param {number} semesterId? optional
+ * @param {number} semesterId? optional, AS QUERYPARAMETER!
  * @return List of courseInstance Objects
  * @memberOf /courseInstance
  **/

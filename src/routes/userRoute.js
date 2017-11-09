@@ -2,7 +2,7 @@ const express = require('express');
 const routerInstance = express.Router();
 const Constants = require('../Constants');
 const authenticationMiddleware = require('../middleware/authenticationMiddleware').authenticationMiddleware;
-const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['email', 'displayName', 'passwordHash']);
+const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['userMail', 'displayName', 'userPasswordHash']);
 const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
 const createSignedToken = require('../helper/tokenhelper').createSignedToken;
@@ -71,8 +71,25 @@ routerInstance.put('/', ensureParametersMiddleware ,(req, res, next) => {
     }).then((user) => {
         let jwtToken = createSignedToken({userId: user.id});
 
-        res.status(200).json({
-            token: jwtToken
+        databaseAdapter.getSemester({}, new Date().toISOString().slice(0, 19).replace('T', ' ')).then((semester) => {
+            if(!semester || semester.length < 1)
+            {
+                res.status(200).json({
+                    token: jwtToken
+                });
+            }
+            else
+            {
+                res.status(200).json({
+                    token: jwtToken,
+                    semester: semester[0]
+                });
+            }
+
+        }).catch((error) =>
+        {
+            res.status(500).json({ message: 'Can not get current Semester',
+                code: Constants.ErrorConstants.UNKNOWN_ERROR });
         });
 
     }).catch((error) => {

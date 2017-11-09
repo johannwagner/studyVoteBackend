@@ -16,8 +16,8 @@ const databaseAdapter = new DatabaseAdapter(5);
 /**
  * Get userProgress statistics according to the current userId for all occupied courses
  * @function GET
- * @param {string} /:id? id of the user
- * @param {number} semesterId id of the current or selected semester
+ * @param {string} / id of the user
+ * @param {number} semesterId id of the current or selected semester, AS QUERY PARAMETER!
  * @return List of all occupied courses with the total number of mandatory vote tasks as well as solved ones
  * @memberOf /userProgress
  **/
@@ -25,7 +25,7 @@ routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
     let UserProgressTupel = {
         userId: req.tokenContext.userId,
         semesterId : req.query.semesterId,
-    }
+    };
 
     databaseAdapter.getCourseUserProgressComplete(UserProgressTupel).then((stats) =>{
         res.status(200).json(stats);
@@ -38,8 +38,7 @@ routerInstance.get('/', authenticationMiddleware,  (req, res, next) => {
 /**
  * Get userProgress statistics according to the current userId for a single course
  * @function GET
- * @param {string} /:id? path
- * @param {number} courseInstanceId id of the select courseInstance
+ * @param {string} /:courseInstanceId? path
  * @return List of all userProgressItems for a single course with some additional information
  * @memberOf /userProgress
  **/
@@ -142,7 +141,7 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
 /**
  * Deletes a single userProgress entry
  * @function DELETE
- * @param {string} /:id? id of the entry
+ * @param {string} /:id id of the entry
  * @return stats of deletion
  * @memberOf /userProgress
  **/
@@ -157,7 +156,7 @@ routerInstance.delete('/:id', (req, res, next) => {
 /**
  * Edit a single entry of the userProgress table, only taskCount changeable
  * @function PUT
- * @param {string} /:id? id of the user
+ * @param {string} /:id id of the user
  * @param {number} taskCount amount of solved tasks
  * @return stats of update
  * @memberOf /userProgress

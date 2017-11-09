@@ -9,8 +9,8 @@ const session = {
     //TODO: randomize
     user: {
         displayName: 'Fred',
-        email: Math.random() + '@feuerstein12.com',
-        passwordHash: 'FredFeuerstein'
+        userMail: Math.random() + '@feuerstein12.com',
+        userPasswordHash: 'FredFeuerstein'
     },
     admissionRequirementItemIds: []
 }
@@ -98,7 +98,7 @@ function createUser() {
 }
 
 function loginUser() {
-    return axiosInstance.post('/token', { userMail: session.user.email, userPasswordHash: session.user.passwordHash}).then(function (response) {
+    return axiosInstance.post('/token', { userMail: session.user.userMail, userPasswordHash: session.user.userPasswordHash}).then(function (response) {
 
         session.token = response.data.token;
         if(!session.token)
@@ -290,11 +290,12 @@ function getAdmissionRequirement()
 {
     return axiosInstance.get('/admissionRequirement/' + session.admissionRequirementId, { headers: axiosInstance.headers }).then(function (response) {
 
+        console.log(response.data);
         if(!response.data || response.data.length !== 1 || response.data[0].id !== session.admissionRequirementId)
             throw 'admissionRequirement Invalid';
 
-        if(!response.data[0].admissionRequirementItems || response.data[0].admissionRequirementItems.length !== 1 || session.admissionRequirementItemId !== response.data[0].admissionRequirementItems[0].id)
-            throw 'admissionRequirementItem Invalid';
+        //if(!response.data[0].admissionRequirementItems || response.data[0].admissionRequirementItems.length !== 1 || session.admissionRequirementItemId !== response.data[0].admissionRequirementItems[0].id)
+        //   throw 'admissionRequirementItem Invalid';
 
         session.courseInstance = response.data[0];
         tests.passed('Get admissionRequirement');
