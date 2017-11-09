@@ -192,9 +192,9 @@ class DatabaseAdapter {
                 '                LEFT JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid  \n' +
                 '                LEFT JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid  \n' +
                 '                LEFT JOIN (admissionrequirementitemweek  \n' +
-                '                JOIN userProgress ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id) ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
+                '                LEFT JOIN (SELECT * FROM userProgress WHERE userProgress.userid = ?) ON userProgress.admissionrequirementitemweekid = admissionrequirementitemweek.id) ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
                 '                WHERE usercourseinstance.userid = ?\n' + semesterisnotNull +
-                '                GROUP BY courseinstance.id', [userProgressTupel.userId]);
+                '                GROUP BY courseinstance.id', [userProgressTupel.userId, userProgressTupel.userId]);
 
         return promiseQuery.then((resultlist) => {
             let pushList = [];
