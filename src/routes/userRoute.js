@@ -53,16 +53,16 @@ routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
 routerInstance.put('/', ensureParametersMiddleware ,(req, res, next) => {
 
     // Check if User with the given email address already exists
-    databaseAdapter.getUser({userMail: req.body.email}).then((user) =>  {
+    databaseAdapter.getUser({userMail: req.body.userMail}).then((user) =>  {
         if(user) {
             throw { message: 'User already registered',
                 code: Constants.ErrorConstants.USER_ALREADY_REGISTERED };
         }
 
         let newUser = {
-                email: req.body.email,
+                email: req.body.userMail,
                 displayName: req.body.displayName,
-                passwordHash: req.body.passwordHash
+                passwordHash: req.body.userPasswordHash
             };
 
         // Save the new user
