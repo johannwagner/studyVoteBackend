@@ -159,8 +159,15 @@ function createCourseInstanceGroup() {
     let data = {
         semesterId : session.semesterId,
         room: '333',
-        startTime: '1970-01-01 15:00:00.0',
-        endTime: '1970-01-01 17:00:00.0'
+        startTime: {
+            hours: 15,
+            minutes: 15
+        },
+        endTime: {
+            hours: 16,
+            minutes: 45
+        },
+        weekDay: 2
     };
 
     return axiosInstance.put('/courseInstance/' + session.courseInstanceId + '/group', data, { headers: axiosInstance.headers }).then(function (response) {
@@ -409,8 +416,15 @@ function changeCourseInstanceGroup()
 {
     let data = {
         room: '334',
-        startTime: '1970-01-01 17:00:00.0',
-        endTime: '1970-01-01 19:00:00.0'
+        startTime: {
+            hours: 14,
+            minutes: 15
+        },
+        endTime: {
+            hours: 17,
+            minutes: 45
+        },
+        weekDay: 3
     };
 
     return axiosInstance.post('/courseInstance/' + session.courseInstanceId + '/group/' + session.courseInstanceGroupId, data, { headers: axiosInstance.headers }).then(function (response) {

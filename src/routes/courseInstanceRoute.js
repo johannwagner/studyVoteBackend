@@ -164,13 +164,28 @@ routerInstance.put('/', authenticationMiddleware, (req, res, next) => {
  **/
 routerInstance.put('/:id/group/', authenticationMiddleware, (req, res, next) => {
 
+    // Handle incoming dates
+    let startTime = new Date();
+    startTime.setHours(req.body.startTime.hours);
+    startTime.setMinutes(req.body.startTime.minutes);
+    startTime.setSeconds(0);
+    startTime.setMonth(0);
+    //startTime.setYear(0);
+
+    let endTime = new Date();
+    endTime.setHours(req.body.endTime.hours);
+    endTime.setMinutes(req.body.endTime.minutes);
+    endTime.setSeconds(0);
+    endTime.setMonth(0);
+    //endTime.setYear(0);
+
     // Check which parameters are passed in the request
     let courseInstanceGroup = {
         courseInstanceId: req.params.id,
         room: req.body.room,
-        startTime: req.body.startTime,
-        endTime: req.body.endTime,
         docent: req.body.docent,
+        startTime: startTime,//.toISOString().slice(0, 19).replace('T', ' '),
+        endTime: endTime,//.toISOString().slice(0, 19).replace('T', ' '),
         weekDay: req.body.weekDay
     };
 
@@ -265,15 +280,33 @@ routerInstance.post('/:id/group/:groupId', authenticationMiddleware, (req, res, 
 
         let newCourseInstanceGroup = {};
 
+        // Handle incoming dates
+        if(req.body.startTime) {
+            let startTime = new Date();
+            startTime.setHours(req.body.startTime.hours);
+            startTime.setMinutes(req.body.startTime.minutes);
+            startTime.setSeconds(0);
+            startTime.setMonth(0);
+            newCourseInstanceGroup.startTime = startTime;//.toISOString().slice(0, 19).replace('T', ' ');
+            //startTime.setYear(0);
+        }
+
+        if(req.body.endTime) {
+            let endTime = new Date();
+            endTime.setHours(req.body.endTime.hours);
+            endTime.setMinutes(req.body.endTime.minutes);
+            endTime.setSeconds(0);
+            endTime.setMonth(0);
+            newCourseInstanceGroup.endTime = endTime;//.toISOString().slice(0, 19).replace('T', ' ');
+            //endTime.setYear(0);}
+        }
+
         // Update only passed Parameters
+        if(req.body.weekDay)
+            newCourseInstanceGroup.weekDay = req.body.weekDay;
+
         if(req.body.room)
             newCourseInstanceGroup.room = req.body.room;
-
-        if(req.body.startTime)
-            newCourseInstanceGroup.startTime = req.body.startTime;
-
-        if(req.body.endTime)
-            newCourseInstanceGroup.endTime = req.body.endTime;
 
         if(Object.keys(newCourseInstanceGroup).length < 1)
             throw { message: 'No update Parameter sent', errorCode: Constants.ErrorConstants.INVALID_PARAMETERS};
