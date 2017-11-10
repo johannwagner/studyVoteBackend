@@ -169,7 +169,9 @@ routerInstance.put('/:id/group/', authenticationMiddleware, (req, res, next) => 
         courseInstanceId: req.params.id,
         room: req.body.room,
         startTime: req.body.startTime,
-        endTime: req.body.endTime
+        endTime: req.body.endTime,
+        docent: req.body.docent,
+        weekDay: req.body.weekDay
     };
 
     // Get the courseInstanceGroups matching the given params
