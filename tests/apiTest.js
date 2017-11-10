@@ -159,6 +159,7 @@ function createCourseInstanceGroup() {
     let data = {
         semesterId : session.semesterId,
         room: '333',
+        docent: 'Gunter Saake',
         startTime: {
             hours: 15,
             minutes: 15
