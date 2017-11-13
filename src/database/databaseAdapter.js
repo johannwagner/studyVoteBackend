@@ -228,7 +228,7 @@ class DatabaseAdapter {
                 'ON\n' +
                 '    admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
                 'WHERE\n' +
-                '    usercourseinstance.userid = ?\n' +
+                '    usercourseinstance.userid = ?\n' + semesterisnotNull +
                 'GROUP BY\n' +
                 '    courseinstance.id', [userProgressTupel.userId, userProgressTupel.userId]);
 
