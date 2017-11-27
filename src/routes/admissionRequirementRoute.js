@@ -107,12 +107,13 @@ routerInstance.put('/', authenticationMiddleware, ensureParametersMiddleware,(re
  * @function PUT
  * @param {string} /item path
  * @param {number} courseInstanceId mandatory
- * @param {number} type admissionRequirementType
+ * @param {number} admissionRequirementType admissionRequirementType
  * @param {date} expireDate? the date this admissionRequirementItem expires
  * @param {number} maxTasks? maxTasks for this admissionRequirementItem
  * @param {number} minTasks? minTasks for this admissionRequirementItem to achieve
  * @param {float} minPercentage? minPercentage for this admissionRequirementItem to achieve
  * @param {bool} mandatory? use this admissionRequirementItem to calculate the userprogress
+ * @param {string} description the description of the arItem
  * @return admissionRequirementItem
  * @memberOf /admissionRequirement
  **/
@@ -143,15 +144,19 @@ routerInstance.put('/item', authenticationMiddleware, ensureParametersMiddleware
             minTasks: req.body.minTasks,
             minPercentage: req.body.minPercentage,
             mandatory: req.body.mandatory,
-            admissionRequirementId: admissionRequirement.id
+            admissionRequirementId: admissionRequirement.id,
+            description: req.body.description
         };
+
+        if(admissionRequirementItem.expireDate)
+            admissionRequirementItem.expireDate = admissionRequirementItem.expireDate.slice(0, 19).replace('T', ' ');
 
         return databaseAdapter.putAdmissionRequirementItem(admissionRequirementItem);
 
     }).then((admissionRequirementItem) => {
         res.status(200).json(admissionRequirementItem);
     }).catch((error) => {
-        res.status(500).json(error);
+            res.status(500).json(error);
     });
 
 });
