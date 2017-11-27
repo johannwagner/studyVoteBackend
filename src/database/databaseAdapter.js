@@ -228,7 +228,7 @@ class DatabaseAdapter {
                 'ON\n' +
                 '    admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
                 'WHERE\n' +
-                '    usercourseinstance.userid = ?\n' +
+                '    usercourseinstance.userid = ?\n' + semesterisnotNull +
                 'GROUP BY\n' +
                 '    courseinstance.id', [userProgressTupel.userId, userProgressTupel.userId]);
 
@@ -387,7 +387,7 @@ class DatabaseAdapter {
         let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, ' +
         'course.id as courseId, semester.id as semesterId, semester.displayName as semesterName, semester.startDate, semester.endDate, ar.id AS arId, arItem.id AS arItemId, arItem.admissionRequirementType,' +
         'arItem.expireDate, arItem.maxTasks, arItem.minTasks, arItem.minPercentage, arItem.mandatory, ciGroup.id AS ciGroupId, ciGroup.courseInstanceId, ciGroup.room AS groupRoom, ' +
-        'ciGroup.startTime, ciGroup.endTime ' +
+        'ciGroup.startTime, ciGroup.endTime, ciGroup.weekDay, ciGroup.docent ' +
         'FROM courseInstance INNER JOIN semester ON courseInstance.semesterId = semester.id ' +
         'INNER JOIN course ON courseInstance.courseId = course.id ' +
         'LEFT JOIN courseInstanceGroup ciGroup ON courseInstance.id = ciGroup.courseInstanceId ' +
@@ -414,6 +414,8 @@ class DatabaseAdapter {
                 let courseInstanceGroup = {
                     id: current.ciGroupId,
                     room: current.groupRoom,
+                    docent: current.docent,
+                    weekDay: current.weekDay,
                     startTime: current.startTime,
                     endTime: current.endTime
                 };
