@@ -132,7 +132,7 @@ class DatabaseAdapter {
 
                 let resultElem = {};
                 let elementFound = false;
-                if(element.TasksAvailable) {
+                if(!_.isNil(element.TasksAvailable)) {
                     elementFound = true;
                     resultElem.result = {
                         percentage : element.Percentage,
@@ -387,7 +387,7 @@ class DatabaseAdapter {
         let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, ' +
         'course.id as courseId, semester.id as semesterId, semester.displayName as semesterName, semester.startDate, semester.endDate, ar.id AS arId, arItem.id AS arItemId, arItem.admissionRequirementType,' +
         'arItem.expireDate, arItem.maxTasks, arItem.minTasks, arItem.minPercentage, arItem.mandatory, ciGroup.id AS ciGroupId, ciGroup.courseInstanceId, ciGroup.room AS groupRoom, ' +
-        'ciGroup.startTime, ciGroup.endTime, ciGroup.weekDay, ciGroup.docent ' +
+        'ciGroup.startTime, ciGroup.endTime, ciGroup.weekDay, ciGroup.docent, arItem.description AS arItemDesc ' +
         'FROM courseInstance INNER JOIN semester ON courseInstance.semesterId = semester.id ' +
         'INNER JOIN course ON courseInstance.courseId = course.id ' +
         'LEFT JOIN courseInstanceGroup ciGroup ON courseInstance.id = ciGroup.courseInstanceId ' +
@@ -408,7 +408,8 @@ class DatabaseAdapter {
                     minTasks: current.minTasks,
                     maxTasks: current.maxTasks,
                     minPercentage: current.minPercentage,
-                    mandatory: current.mandatory
+                    mandatory: current.mandatory,
+                    description: current.arItemDesc
                 };
 
                 let courseInstanceGroup = {
