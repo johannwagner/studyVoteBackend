@@ -202,6 +202,9 @@ routerInstance.post('/item/:id', authenticationMiddleware, (req, res, next) => {
         if(req.body.admissionRequirementType)
             newAdmissionRequirementItem.admissionRequirementType = req.body.admissionRequirementType;
 
+        if(req.body.description)
+            newAdmissionRequirementItem.description = req.body.description;
+
         if(req.body.expireDate)
             newAdmissionRequirementItem.expireDate = req.body.expireDate;
 
@@ -216,6 +219,9 @@ routerInstance.post('/item/:id', authenticationMiddleware, (req, res, next) => {
 
         if(!_.isUndefined(req.body.mandatory))
             newAdmissionRequirementItem.mandatory = req.body.mandatory;
+
+        if(newAdmissionRequirementItem.expireDate)
+            newAdmissionRequirementItem.expireDate = newAdmissionRequirementItem.expireDate.slice(0, 19).replace('T', ' ');
 
         if(Object.keys(newAdmissionRequirementItem).length < 1)
             throw { message: 'No update Parameter sent', errorCode: Constants.ErrorConstants.INVALID_PARAMETERS};
