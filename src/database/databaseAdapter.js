@@ -1,5 +1,4 @@
 const MySQL = require('promise-mysql');
-const DatabaseSecrets = require('../../secrets/databaseSecrets');
 const _ = require('lodash');
 
 class DatabaseAdapter {
@@ -8,9 +7,12 @@ class DatabaseAdapter {
         const inTestMode = process.env.NODE_ENV === 'test';
 
         this.poolPromise = MySQL.createPool({
-            ...DatabaseSecrets.DatabaseSecrets,
+            host     : process.env.DB_HOST,
+            port     : process.env.DB_PORT || 3306,
+            user     : 'root',
+            password : process.env.DB_ROOT_PASSWORD,
             connectionLimit: poolCount,
-            database: DatabaseSecrets.DatabaseSecrets.database + ( inTestMode ? 'test' : '' )
+            database: process.env.DB_NAME + ( inTestMode ? 'test' : '' )
         })
 
     }

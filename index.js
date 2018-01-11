@@ -37,7 +37,9 @@ expressInstance.use('/admissionRequirement', admissionRequirementRouter);
 expressInstance.use('/debug', debugRouter);
 
 // TODO: Add Parameter for Port
-const server = expressInstance.listen(1337);
+const serverPort = process.env.SERVER_PORT || 1337;
+
+const server = expressInstance.listen(serverPort);
 
 expressInstance.closeServer = (cb) => {
     console.log('Close Server');
