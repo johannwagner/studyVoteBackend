@@ -5,7 +5,7 @@ const authenticationMiddleware = require('../middleware/authenticationMiddleware
 const ensureParametersMiddleware = require('../middleware/ensureParameters').ensureParameters(['userMail', 'displayName', 'userPasswordHash']);
 const DatabaseAdapter = require('../database/databaseAdapter');
 const databaseAdapter = new DatabaseAdapter(5);
-const createSignedToken = require('../helper/tokenhelper').createSignedToken;
+const createSignedToken = require('../helper/tokenHelper').createSignedToken;
 
 
 //region - Get -

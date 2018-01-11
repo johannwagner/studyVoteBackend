@@ -4,7 +4,7 @@ const routerInstance = express.Router();
 const DatabaseAdapter = require('../database/databaseAdapter');
 const Constants = require('../Constants');
 const databaseAdapter = new DatabaseAdapter(5);
-const createSignedToken = require('../helper/tokenhelper').createSignedToken;
+const createSignedToken = require('../helper/tokenHelper').createSignedToken;
 
 //region - Post -
 
