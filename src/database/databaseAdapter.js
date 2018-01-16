@@ -106,19 +106,19 @@ class DatabaseAdapter {
      * @param  userProgressTupel
      */
     getCourseUserProgressDetailed(userProgressTupel){
-        let promiseQuery = this.poolPromise.query('SELECT admissionrequirementitem.id AS arId, admissionrequirementitem.admissionrequirementtype AS arType, courseinstance.id as courseinstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionrequirementitem.mandatory, admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionrequirementitemweek.maxCount) as Percentage, admissionrequirementitemweek.id as weekId, admissionrequirementitemweek.semesterWeek \n' +
+        let promiseQuery = this.poolPromise.query('SELECT admissionRequirementItem.id AS arId, admissionRequirementItem.admissionRequirementtype AS arType, courseInstance.id as courseInstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionRequirementItem.mandatory, admissionRequirementItem.admissionRequirementtype, admissionRequirementItemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionRequirementItemweek.maxCount) as Percentage, admissionRequirementItemweek.id as weekId, admissionRequirementItemweek.semesterWeek \n' +
             '             \n' +
             '            FROM  \n' +
             '             \n' +
-            '            usercourseinstance  \n' +
-            '            JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid  \n' +
-            '            JOIN course ON course.id = courseinstance.courseid  \n' +
-            '            JOIN semester ON semester.id = courseinstance.semesterid  \n' +
-            '            LEFT JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid  \n' +
-            '            LEFT JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid  \n' +
-            '            LEFT JOIN admissionrequirementitemweek ON admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid \n' +
-            '            LEFT JOIN userProgress ON admissionrequirementitemweek.id = userProgress.admissionrequirementitemweekid AND userProgress.userId = usercourseInstance.userId \n' +
-            '            WHERE usercourseinstance.userid = ? AND courseinstance.id = ? ORDER BY admissionrequirementitem.admissionrequirementtype, admissionrequirementitemweek.semesterWeek', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
+            '            userCourseInstance  \n' +
+            '            JOIN courseInstance ON courseInstance.id = userCourseInstance.courseInstanceid  \n' +
+            '            JOIN course ON course.id = courseInstance.courseid  \n' +
+            '            JOIN semester ON semester.id = courseInstance.semesterid  \n' +
+            '            LEFT JOIN admissionRequirement ON courseInstance.id = admissionRequirement.courseInstanceid  \n' +
+            '            LEFT JOIN admissionRequirementItem ON admissionRequirement.id = admissionRequirementItem.admissionRequirementid  \n' +
+            '            LEFT JOIN admissionRequirementItemweek ON admissionRequirementItem.id = admissionRequirementItemweek.admissionRequirementItemid \n' +
+            '            LEFT JOIN userProgress ON admissionRequirementItemweek.id = userProgress.admissionRequirementItemweekid AND userProgress.userId = userCourseInstance.userId \n' +
+            '            WHERE userCourseInstance.userid = ? AND courseInstance.id = ? ORDER BY admissionRequirementItem.admissionRequirementtype, admissionRequirementItemweek.semesterWeek', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
 
         return promiseQuery.then((resultList) => {
             let pushList = [];
@@ -151,7 +151,7 @@ class DatabaseAdapter {
                 }
                     /*,
                     courseInstance: {
-                        id: element.courseinstanceId,
+                        id: element.courseInstanceId,
                         courseName: element.CourseName,
                         courseShortName: element.CourseShortName
                     },
@@ -184,38 +184,38 @@ class DatabaseAdapter {
         }
 
             let promiseQuery = this.poolPromise.query('SELECT\n' +
-                '    courseinstance.id AS courseinstanceId,\n' +
+                '    courseInstance.id AS courseInstanceId,\n' +
                 '    course.displayname AS CourseName,\n' +
                 '    course.shortname AS CourseShortName,\n' +
                 '    semester.displayname AS SemesterName,\n' +
                 '    semester.enddate,\n' +
                 '    semester.id AS SemesterId,\n' +
-                '    admissionrequirementitem.minPercentage,\n' +
-                '    admissionrequirementitem.minTasks,\n' +
-                '    admissionrequirementitem.maxTasks,\n' +
-                '    admissionrequirementitem.mandatory,\n' +
-                '    admissionrequirementitem.admissionrequirementtype,\n' +
+                '    admissionRequirementItem.minPercentage,\n' +
+                '    admissionRequirementItem.minTasks,\n' +
+                '    admissionRequirementItem.maxTasks,\n' +
+                '    admissionRequirementItem.mandatory,\n' +
+                '    admissionRequirementItem.admissionRequirementtype,\n' +
                 '    SUM(\n' +
-                '        admissionrequirementitemweek.maxCount\n' +
+                '        admissionRequirementItemweek.maxCount\n' +
                 '    ) AS TasksAvailable,\n' +
                 '    SUM(up2.`taskCount`) AS TasksSolved,\n' +
-                '    admissionrequirementitem.minPercentage,\n' +
-                '    courseinstance.room,\n' +
-                '    courseinstance.docent,\n' +
+                '    admissionRequirementItem.minPercentage,\n' +
+                '    courseInstance.room,\n' +
+                '    courseInstance.docent,\n' +
                 '    (\n' +
                 '        SUM(up2.`taskCount`) / SUM(\n' +
-                '            admissionrequirementitemweek.maxCount\n' +
+                '            admissionRequirementItemweek.maxCount\n' +
                 '        )\n' +
                 '    ) AS Percentage\n' +
                 'FROM\n' +
-                '    usercourseinstance\n' +
-                'JOIN courseinstance ON courseinstance.id = usercourseinstance.courseinstanceid\n' +
-                'JOIN course ON course.id = courseinstance.courseid\n' +
-                'JOIN semester ON semester.id = courseinstance.semesterid\n' +
-                'LEFT JOIN admissionrequirement ON courseinstance.id = admissionrequirement.courseinstanceid\n' +
-                'LEFT JOIN admissionrequirementitem ON admissionrequirement.id = admissionrequirementitem.admissionrequirementid\n' +
+                '    userCourseInstance\n' +
+                'JOIN courseInstance ON courseInstance.id = userCourseInstance.courseInstanceid\n' +
+                'JOIN course ON course.id = courseInstance.courseid\n' +
+                'JOIN semester ON semester.id = courseInstance.semesterid\n' +
+                'LEFT JOIN admissionRequirement ON courseInstance.id = admissionRequirement.courseInstanceid\n' +
+                'LEFT JOIN admissionRequirementItem ON admissionRequirement.id = admissionRequirementItem.admissionRequirementid\n' +
                 'LEFT JOIN(\n' +
-                '        admissionrequirementitemweek\n' +
+                '        admissionRequirementItemweek\n' +
                 '    LEFT JOIN(\n' +
                 '        SELECT\n' +
                 '            *\n' +
@@ -225,14 +225,14 @@ class DatabaseAdapter {
                 '            userprogress.userid = ?\n' +
                 '    ) AS up2\n' +
                 'ON\n' +
-                '    up2.admissionrequirementitemweekid = admissionrequirementitemweek.id\n' +
+                '    up2.admissionRequirementItemweekid = admissionRequirementItemweek.id\n' +
                 '    )\n' +
                 'ON\n' +
-                '    admissionrequirementitem.id = admissionrequirementitemweek.admissionrequirementitemid\n' +
+                '    admissionRequirementItem.id = admissionRequirementItemweek.admissionRequirementItemid\n' +
                 'WHERE\n' +
-                '    usercourseinstance.userid = ?\n' + semesterisnotNull +
+                '    userCourseInstance.userid = ?\n' + semesterisnotNull +
                 'GROUP BY\n' +
-                '    courseinstance.id', [userProgressTupel.userId, userProgressTupel.userId]);
+                '    courseInstance.id', [userProgressTupel.userId, userProgressTupel.userId]);
 
         return promiseQuery.then((resultlist) => {
             let pushList = [];
@@ -248,7 +248,7 @@ class DatabaseAdapter {
                     percentageDone : result.Percentage
                     },
                     courseInstance : {
-                        id : result.courseinstanceId,
+                        id : result.courseInstanceId,
                         displayName : result.CourseName,
                         shortName : result.CourseShortName,
                         room : result.room,
@@ -492,7 +492,7 @@ class DatabaseAdapter {
      * @param params
      */
     deleteUserCourseInstance(params){
-        this.poolPromise.query('DELETE FROM usercourseinstance ' + this.createWherePart(params));
+        this.poolPromise.query('DELETE FROM userCourseInstance ' + this.createWherePart(params));
 
     }
     /**
@@ -501,7 +501,7 @@ class DatabaseAdapter {
      */
     getUserCourseInstances(params)
     {
-        let promiseQuery = this.poolPromise.query('SELECT * FROM usercourseinstance ' + this.createWherePart(params));
+        let promiseQuery = this.poolPromise.query('SELECT * FROM userCourseInstance ' + this.createWherePart(params));
 
         return promiseQuery.then((paramsParam) => {
                 return paramsParam;
@@ -514,9 +514,9 @@ class DatabaseAdapter {
      */
     putUserCourseInstance(params)
     {
-        /*let promiseQuery = this.poolPromise.query('INSERT INTO usercourseinstance (userId, courseInstanceId) VALUES (?,?)', [params.userId, params.courseInstanceId]);*/
+        /*let promiseQuery = this.poolPromise.query('INSERT INTO userCourseInstance (userId, courseInstanceId) VALUES (?,?)', [params.userId, params.courseInstanceId]);*/
 
-        let promiseQuery = this.poolPromise.query('INSERT INTO usercourseinstance ' + this.createInsertPart(params));
+        let promiseQuery = this.poolPromise.query('INSERT INTO userCourseInstance ' + this.createInsertPart(params));
 
         return promiseQuery.then((result) => {
             params.id = result.insertId;
@@ -530,7 +530,7 @@ class DatabaseAdapter {
      */
     getCourseInstanceGroups(params)
     {
-        let promiseQuery = this.poolPromise.query('SELECT * FROM courseinstancegroup '+ this.createWherePart(params));
+        let promiseQuery = this.poolPromise.query('SELECT * FROM courseInstanceGroup '+ this.createWherePart(params));
 
         return promiseQuery.then((result) => {
             return result;
@@ -542,7 +542,7 @@ class DatabaseAdapter {
      * @param params
      */
     putCourseInstanceGroup(courseInstanceGroup){
-        let promiseQuery = this.poolPromise.query('INSERT INTO courseinstancegroup ' + this.createInsertPart(courseInstanceGroup));
+        let promiseQuery = this.poolPromise.query('INSERT INTO courseInstanceGroup ' + this.createInsertPart(courseInstanceGroup));
 
         return promiseQuery.then((result) => {
             courseInstanceGroup.id =  result.insertId;
@@ -574,7 +574,7 @@ class DatabaseAdapter {
     putAdmissionRequirement(admissionRequirement)
     {
 
-        let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirement ' + this.createInsertPart(admissionRequirement));
+        let promiseQuery = this.poolPromise.query('INSERT INTO admissionRequirement ' + this.createInsertPart(admissionRequirement));
 
         return promiseQuery.then((result) => {
             admissionRequirement.id = result.insertId;
@@ -588,7 +588,7 @@ class DatabaseAdapter {
      */
     putAdmissionRequirementItem(admissionRequirementItem)
     {
-        let promiseQuery = this.poolPromise.query('INSERT INTO admissionrequirementItem ' + this.createInsertPart(admissionRequirementItem));
+        let promiseQuery = this.poolPromise.query('INSERT INTO admissionRequirementItem ' + this.createInsertPart(admissionRequirementItem));
 
 
         return promiseQuery.then((result) => {
@@ -604,7 +604,7 @@ class DatabaseAdapter {
      */
     postAdmissionRequirementItem(admissionRequirementItem, params)
     {
-        let promiseQuery = this.poolPromise.query('UPDATE admissionrequirementItem ' + this.createUpdatePart(admissionRequirementItem) + ' ' + this.createWherePart(params));
+        let promiseQuery = this.poolPromise.query('UPDATE admissionRequirementItem ' + this.createUpdatePart(admissionRequirementItem) + ' ' + this.createWherePart(params));
 
         return promiseQuery.then((result) => {
             return result;
@@ -617,7 +617,7 @@ class DatabaseAdapter {
      */
     deleteAdmissionRequirementItem(params)
     {
-        let promiseQuery = this.poolPromise.query('DELETE FROM admissionrequirementItem ' + this.createWherePart(params));
+        let promiseQuery = this.poolPromise.query('DELETE FROM admissionRequirementItem ' + this.createWherePart(params));
 
         return promiseQuery.then((result) => {
             result;
@@ -720,7 +720,7 @@ class DatabaseAdapter {
     {
         /*let promiseQuery = this.poolPromise.query('INSERT INTO userprogress (userId, admissionRequirementItemWeekId, createDate, taskCount) VALUES (?,?,?,?)', [admissionRequirementItem.userId, admissionRequirementItem.admissionRequirementItemWeekId, admissionRequirementItem.createDate, admissionRequirementItem.taskCount]);*/
 
-        let promiseQuery = this.poolPromise.query('INSERT INTO userprogress ' + this.createInsertPart(userProgressItem));
+        let promiseQuery = this.poolPromise.query('INSERT INTO userProgress ' + this.createInsertPart(userProgressItem));
 
         return promiseQuery.then((result) => {
             userProgressItem.id = result.insertId;
@@ -734,7 +734,7 @@ class DatabaseAdapter {
      */
     getUserProgesses(params)
     {
-        let promiseQuery = this.poolPromise.query('SELECT * FROM userprogress ' + this.createWherePart(params));
+        let promiseQuery = this.poolPromise.query('SELECT * FROM userProgress ' + this.createWherePart(params));
 
         return promiseQuery;
     }
@@ -744,7 +744,7 @@ class DatabaseAdapter {
      * @param id of entry
      */
     deleteUserProgress(param){
-        let promiseQuery = this.poolPromise.query('DELETE FROM userprogress WHERE id = ?', [param]);
+        let promiseQuery = this.poolPromise.query('DELETE FROM userpProgress WHERE id = ?', [param]);
         return promiseQuery;
     }
 
@@ -753,7 +753,7 @@ class DatabaseAdapter {
      * @param paramPackage
      */
     updateUserProgress(paramPackage, returnObject){
-        let promiseQuery = this.poolPromise.query('UPDATE userprogress SET taskCount = ? WHERE id = ?', [paramPackage.taskCount, paramPackage.id]);
+        let promiseQuery = this.poolPromise.query('UPDATE userProgress SET taskCount = ? WHERE id = ?', [paramPackage.taskCount, paramPackage.id]);
         return promiseQuery;
     }
 
