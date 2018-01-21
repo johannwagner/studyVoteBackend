@@ -9,7 +9,7 @@ class DatabaseAdapter {
         this.poolPromise = MySQL.createPool({
             host     : process.env.DB_HOST,
             port     : process.env.DB_PORT || 3306,
-            user     : 'root',
+            user     : process.env.DB_USER || 'root',
             password : process.env.DB_ROOT_PASSWORD,
             connectionLimit: poolCount,
             database: process.env.DB_NAME + ( inTestMode ? 'test' : '' )
@@ -106,19 +106,19 @@ class DatabaseAdapter {
      * @param  userProgressTupel
      */
     getCourseUserProgressDetailed(userProgressTupel){
-        let promiseQuery = this.poolPromise.query('SELECT admissionRequirementItem.id AS arId, admissionRequirementItem.admissionRequirementtype AS arType, courseInstance.id as courseInstanceId, course.displayname as CourseName , course.shortname as CourseShortName, semester.displayname as SemesterName, semester.enddate, semester.id as SemesterId, admissionRequirementItem.mandatory, admissionRequirementItem.admissionRequirementtype, admissionRequirementItemweek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionRequirementItemweek.maxCount) as Percentage, admissionRequirementItemweek.id as weekId, admissionRequirementItemweek.semesterWeek \n' +
+        let promiseQuery = this.poolPromise.query('SELECT admissionRequirementItem.id AS arId, admissionRequirementItem.admissionRequirementType AS arType, courseInstance.id as courseInstanceId, course.displayName as CourseName , course.shortname as CourseShortName, semester.displayName as SemesterName, semester.enddate, semester.id as SemesterId, admissionRequirementItem.mandatory, admissionRequirementItem.admissionRequirementType, admissionRequirementItemWeek.maxCount as TasksAvailable, userProgress.`taskCount` as TasksSolved, (userProgress.`taskCount`/ admissionRequirementItemWeek.maxCount) as Percentage, admissionRequirementItemWeek.id as weekId, admissionRequirementItemWeek.semesterWeek \n' +
             '             \n' +
             '            FROM  \n' +
             '             \n' +
             '            userCourseInstance  \n' +
             '            JOIN courseInstance ON courseInstance.id = userCourseInstance.courseInstanceid  \n' +
-            '            JOIN course ON course.id = courseInstance.courseid  \n' +
-            '            JOIN semester ON semester.id = courseInstance.semesterid  \n' +
+            '            JOIN course ON course.id = courseInstance.courseId  \n' +
+            '            JOIN semester ON semester.id = courseInstance.semesterId  \n' +
             '            LEFT JOIN admissionRequirement ON courseInstance.id = admissionRequirement.courseInstanceid  \n' +
-            '            LEFT JOIN admissionRequirementItem ON admissionRequirement.id = admissionRequirementItem.admissionRequirementid  \n' +
-            '            LEFT JOIN admissionRequirementItemweek ON admissionRequirementItem.id = admissionRequirementItemweek.admissionRequirementItemid \n' +
-            '            LEFT JOIN userProgress ON admissionRequirementItemweek.id = userProgress.admissionRequirementItemweekid AND userProgress.userId = userCourseInstance.userId \n' +
-            '            WHERE userCourseInstance.userid = ? AND courseInstance.id = ? ORDER BY admissionRequirementItem.admissionRequirementtype, admissionRequirementItemweek.semesterWeek', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
+            '            LEFT JOIN admissionRequirementItem ON admissionRequirement.id = admissionRequirementItem.admissionRequirementId  \n' +
+            '            LEFT JOIN admissionRequirementItemWeek ON admissionRequirementItem.id = admissionRequirementItemWeek.admissionRequirementItemid \n' +
+            '            LEFT JOIN userProgress ON admissionRequirementItemWeek.id = userProgress.admissionRequirementItemWeekId AND userProgress.userId = userCourseInstance.userId \n' +
+            '            WHERE userCourseInstance.userid = ? AND courseInstance.id = ? ORDER BY admissionRequirementItem.admissionRequirementType, admissionRequirementItemWeek.semesterWeek', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
 
         return promiseQuery.then((resultList) => {
             let pushList = [];
@@ -185,18 +185,18 @@ class DatabaseAdapter {
 
             let promiseQuery = this.poolPromise.query('SELECT\n' +
                 '    courseInstance.id AS courseInstanceId,\n' +
-                '    course.displayname AS CourseName,\n' +
+                '    course.displayName AS CourseName,\n' +
                 '    course.shortname AS CourseShortName,\n' +
-                '    semester.displayname AS SemesterName,\n' +
+                '    semester.displayName AS SemesterName,\n' +
                 '    semester.enddate,\n' +
                 '    semester.id AS SemesterId,\n' +
                 '    admissionRequirementItem.minPercentage,\n' +
                 '    admissionRequirementItem.minTasks,\n' +
                 '    admissionRequirementItem.maxTasks,\n' +
                 '    admissionRequirementItem.mandatory,\n' +
-                '    admissionRequirementItem.admissionRequirementtype,\n' +
+                '    admissionRequirementItem.admissionRequirementType,\n' +
                 '    SUM(\n' +
-                '        admissionRequirementItemweek.maxCount\n' +
+                '        admissionRequirementItemWeek.maxCount\n' +
                 '    ) AS TasksAvailable,\n' +
                 '    SUM(up2.`taskCount`) AS TasksSolved,\n' +
                 '    admissionRequirementItem.minPercentage,\n' +
@@ -204,18 +204,18 @@ class DatabaseAdapter {
                 '    courseInstance.docent,\n' +
                 '    (\n' +
                 '        SUM(up2.`taskCount`) / SUM(\n' +
-                '            admissionRequirementItemweek.maxCount\n' +
+                '            admissionRequirementItemWeek.maxCount\n' +
                 '        )\n' +
                 '    ) AS Percentage\n' +
                 'FROM\n' +
                 '    userCourseInstance\n' +
                 'JOIN courseInstance ON courseInstance.id = userCourseInstance.courseInstanceid\n' +
-                'JOIN course ON course.id = courseInstance.courseid\n' +
-                'JOIN semester ON semester.id = courseInstance.semesterid\n' +
+                'JOIN course ON course.id = courseInstance.courseId\n' +
+                'JOIN semester ON semester.id = courseInstance.semesterId\n' +
                 'LEFT JOIN admissionRequirement ON courseInstance.id = admissionRequirement.courseInstanceid\n' +
-                'LEFT JOIN admissionRequirementItem ON admissionRequirement.id = admissionRequirementItem.admissionRequirementid\n' +
+                'LEFT JOIN admissionRequirementItem ON admissionRequirement.id = admissionRequirementItem.admissionRequirementId\n' +
                 'LEFT JOIN(\n' +
-                '        admissionRequirementItemweek\n' +
+                '        admissionRequirementItemWeek\n' +
                 '    LEFT JOIN(\n' +
                 '        SELECT\n' +
                 '            *\n' +
@@ -225,10 +225,10 @@ class DatabaseAdapter {
                 '            userprogress.userid = ?\n' +
                 '    ) AS up2\n' +
                 'ON\n' +
-                '    up2.admissionRequirementItemweekid = admissionRequirementItemweek.id\n' +
+                '    up2.admissionRequirementItemWeekId = admissionRequirementItemWeek.id\n' +
                 '    )\n' +
                 'ON\n' +
-                '    admissionRequirementItem.id = admissionRequirementItemweek.admissionRequirementItemid\n' +
+                '    admissionRequirementItem.id = admissionRequirementItemWeek.admissionRequirementItemid\n' +
                 'WHERE\n' +
                 '    userCourseInstance.userid = ?\n' + semesterisnotNull +
                 'GROUP BY\n' +
