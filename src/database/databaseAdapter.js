@@ -118,7 +118,7 @@ class DatabaseAdapter {
             '            LEFT JOIN admissionRequirementItem ON admissionRequirement.id = admissionRequirementItem.admissionRequirementId  \n' +
             '            LEFT JOIN admissionRequirementItemWeek ON admissionRequirementItem.id = admissionRequirementItemWeek.admissionRequirementItemid \n' +
             '            LEFT JOIN userProgress ON admissionRequirementItemWeek.id = userProgress.admissionRequirementItemWeekId AND userProgress.userId = userCourseInstance.userId \n' +
-            '            WHERE userCourseInstance.userid = ? AND courseInstance.id = ? ORDER BY admissionRequirementItem.admissionRequirementType, admissionRequirementItemWeek.semesterWeek', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
+            '            WHERE userCourseInstance.userId = ? AND courseInstance.id = ? ORDER BY admissionRequirementItem.admissionRequirementType, admissionRequirementItemWeek.semesterWeek', [userProgressTupel.userId, userProgressTupel.courseInstanceId]);
 
         return promiseQuery.then((resultList) => {
             let pushList = [];
@@ -222,7 +222,7 @@ class DatabaseAdapter {
                 '        FROM\n' +
                 '            userprogress\n' +
                 '        WHERE\n' +
-                '            userprogress.userid = ?\n' +
+                '            userprogress.userId = ?\n' +
                 '    ) AS up2\n' +
                 'ON\n' +
                 '    up2.admissionRequirementItemWeekId = admissionRequirementItemWeek.id\n' +
@@ -230,7 +230,7 @@ class DatabaseAdapter {
                 'ON\n' +
                 '    admissionRequirementItem.id = admissionRequirementItemWeek.admissionRequirementItemid\n' +
                 'WHERE\n' +
-                '    userCourseInstance.userid = ?\n' + semesterisnotNull +
+                '    userCourseInstance.userId = ?\n' + semesterisnotNull +
                 'GROUP BY\n' +
                 '    courseInstance.id', [userProgressTupel.userId, userProgressTupel.userId]);
 
