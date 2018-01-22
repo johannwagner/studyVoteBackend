@@ -220,9 +220,9 @@ class DatabaseAdapter {
                 '        SELECT\n' +
                 '            *\n' +
                 '        FROM\n' +
-                '            userprogress\n' +
+                '            userProgress\n' +
                 '        WHERE\n' +
-                '            userprogress.userId = ?\n' +
+                '            userProgress.userId = ?\n' +
                 '    ) AS up2\n' +
                 'ON\n' +
                 '    up2.admissionRequirementItemWeekId = admissionRequirementItemWeek.id\n' +
@@ -718,7 +718,7 @@ class DatabaseAdapter {
      */
     putUserProgess(userProgressItem)
     {
-        /*let promiseQuery = this.poolPromise.query('INSERT INTO userprogress (userId, admissionRequirementItemWeekId, createDate, taskCount) VALUES (?,?,?,?)', [admissionRequirementItem.userId, admissionRequirementItem.admissionRequirementItemWeekId, admissionRequirementItem.createDate, admissionRequirementItem.taskCount]);*/
+        /*let promiseQuery = this.poolPromise.query('INSERT INTO userProgress (userId, admissionRequirementItemWeekId, createDate, taskCount) VALUES (?,?,?,?)', [admissionRequirementItem.userId, admissionRequirementItem.admissionRequirementItemWeekId, admissionRequirementItem.createDate, admissionRequirementItem.taskCount]);*/
 
         let promiseQuery = this.poolPromise.query('INSERT INTO userProgress ' + this.createInsertPart(userProgressItem));
 
