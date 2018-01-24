@@ -185,23 +185,23 @@ class DatabaseAdapter {
 
             let promiseQuery = this.poolPromise.query('SELECT\n' +
                 '    courseInstance.id AS courseInstanceId,\n' +
-                '    course.displayName AS CourseName,\n' +
-                '    course.shortname AS CourseShortName,\n' +
-                '    semester.displayName AS SemesterName,\n' +
-                '    semester.enddate,\n' +
-                '    semester.id AS SemesterId,\n' +
-                '    admissionRequirementItem.minPercentage,\n' +
-                '    admissionRequirementItem.minTasks,\n' +
-                '    admissionRequirementItem.maxTasks,\n' +
-                '    admissionRequirementItem.mandatory,\n' +
-                '    admissionRequirementItem.admissionRequirementType,\n' +
+                '    ANY_VALUE(course.displayName) AS CourseName,\n' +
+                '    ANY_VALUE(course.shortname) AS CourseShortName,\n' +
+                '    ANY_VALUE(semester.displayName) AS SemesterName,\n' +
+                '    ANY_VALUE(semester.enddate),\n' +
+                '    ANY_VALUE(semester.id) AS SemesterId,\n' +
+                '    ANY_VALUE(admissionRequirementItem.minPercentage),\n' +
+                '    ANY_VALUE(admissionRequirementItem.minTasks),\n' +
+                '    ANY_VALUE(admissionRequirementItem.maxTasks),\n' +
+                '    ANY_VALUE(admissionRequirementItem.mandatory),\n' +
+                '    ANY_VALUE(admissionRequirementItem.admissionRequirementType),\n' +
                 '    SUM(\n' +
                 '        admissionRequirementItemWeek.maxCount\n' +
                 '    ) AS TasksAvailable,\n' +
                 '    SUM(up2.`taskCount`) AS TasksSolved,\n' +
-                '    admissionRequirementItem.minPercentage,\n' +
-                '    courseInstance.room,\n' +
-                '    courseInstance.docent,\n' +
+                '    ANY_VALUE(admissionRequirementItem.minPercentage),\n' +
+                '    ANY_VALUE(courseInstance.room),\n' +
+                '    ANY_VALUE(courseInstance.docent),\n' +
                 '    (\n' +
                 '        SUM(up2.`taskCount`) / SUM(\n' +
                 '            admissionRequirementItemWeek.maxCount\n' +
