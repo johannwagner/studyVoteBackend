@@ -37,7 +37,8 @@ routerInstance.get('/', authenticationMiddleware, (req, res, next) => {
         params['semester.id'] = req.query['semesterId'];
 
     // Get the courseInstances matching the given params
-    databaseAdapter.getCourseInstances(params).then((courseInstances) => {
+    // Pass userId to filter only not participated courseInstances
+    databaseAdapter.getCourseInstances(params,  req.tokenContext.userId).then((courseInstances) => {
         res.status(200).json(courseInstances);
 
     }).catch((error) => {

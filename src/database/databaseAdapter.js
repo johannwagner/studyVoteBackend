@@ -356,9 +356,10 @@ class DatabaseAdapter {
      * Gets the courseInstances matching the passed params
      * @param params semesterId
      */
-    getCourseInstances(params)
+    getCourseInstances(params, userId)
     {
-        let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, course.id as id2, semester.id as id3, semester.displayName as semesterName, semester.startDate, semester.endDate FROM courseInstance JOIN semester ON courseInstance.semesterId = semester.id JOIN course ON courseInstance.courseId = course.id ' + this.createWherePart(params));
+        let promiseQuery = this.poolPromise.query('SELECT courseInstance.id, course.shortName, course.displayName, courseInstance.semesterId, course.id as id2, semester.id as id3, semester.displayName as semesterName, semester.startDate, semester.endDate FROM courseInstance JOIN semester ON courseInstance.semesterId = semester.id JOIN course ON courseInstance.courseId = course.id ' + this.createWherePart(params)
+            + ' AND courseInstance.id NOT IN (SELECT uc.courseInstanceId FROM userCourseInstance uc WHERE uc.userId = ?)', [userId]);
 
         return promiseQuery.then((resultList) => {
             return _.map(resultList, (rItem) => {
