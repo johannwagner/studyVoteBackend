@@ -310,7 +310,7 @@ routerInstance.post('/:id/group/:groupId', authenticationMiddleware, (req, res, 
             newCourseInstanceGroup.room = req.body.room;
 
         if(req.body.docent)
-            newCourseInstanceGroup.room = req.body.docent;
+            newCourseInstanceGroup.docent = req.body.docent;
 
         if(Object.keys(newCourseInstanceGroup).length < 1)
             throw { message: 'No update Parameter sent', errorCode: Constants.ErrorConstants.INVALID_PARAMETERS};
